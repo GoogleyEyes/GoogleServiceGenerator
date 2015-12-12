@@ -1,0 +1,6 @@
+framework module GoogleAPIs {
+  umbrella header "GoogleAPISwiftClient-umbrella.h"
+
+  export *
+  module * { export * }
+}
