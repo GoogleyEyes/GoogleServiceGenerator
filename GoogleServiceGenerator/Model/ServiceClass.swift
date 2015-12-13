@@ -142,6 +142,8 @@ class ServiceClass: SourceFileGeneratable, CustomStringConvertible {
     }
 }
 
+import Alamofire
+
 class APIMethod: SourceFileGeneratable, CustomStringConvertible {
     var requiredParams: [Property]
     var nonRequiredParams: [Property]
@@ -150,8 +152,11 @@ class APIMethod: SourceFileGeneratable, CustomStringConvertible {
     var returnTypeVariableName: String // (schema name).objcName(shouldCapitalize: false)
     var endpoint: String
     weak var serviceClass: ServiceClass!
+    var requestMethod: Alamofire.Method
+    var jsonPostBodyType: String?
+    var jsonPostBodyVarName: String?
     
-    init(name: String, parameters: [Property], returnType: String?, returnTypeVariableName: String? = nil, endpoint: String, serviceClass: ServiceClass) {
+    init(name: String, requestMethod: Alamofire.Method = .GET, parameters: [Property], jsonPostBodyType: String? = nil, jsonPostBodyVarName: String? = nil, returnType: String?, returnTypeVariableName: String? = nil, endpoint: String, serviceClass: ServiceClass) {
         self.parameters = parameters
         self.requiredParams = []
         self.serviceClass = serviceClass
@@ -169,6 +174,15 @@ class APIMethod: SourceFileGeneratable, CustomStringConvertible {
         self.returnType = returnType != nil ? returnType! : Types.Bool.rawValue
         self.returnTypeVariableName = returnTypeVariableName != nil ? returnTypeVariableName! : "success"
         self.endpoint = endpoint
+        self.requestMethod = requestMethod
+        self.jsonPostBodyType = jsonPostBodyType
+        self.jsonPostBodyVarName = jsonPostBodyVarName
+        if jsonPostBodyType != nil {
+            let reqpar = self.requiredParams
+            var newReqPar = [Property(nameFoundInJSONSchema: jsonPostBodyVarName!, type: jsonPostBodyType!, optionality: .NonOptional, required: true, description: "Post Body")]
+            newReqPar.appendContentsOf(reqpar)
+            self.requiredParams = newReqPar
+        }
         
         
         super.init()
@@ -228,7 +242,14 @@ class APIMethod: SourceFileGeneratable, CustomStringConvertible {
         
         // 4) performRequest
         let endpointStr = endpoint.stringByReplacingOccurrencesOfString("{", withString: "\\(").stringByReplacingOccurrencesOfString("}", withString: ")")
-        string += "GoogleServiceFetcher.sharedInstance.performRequest(serviceName: apiNameInURL, apiVersion: apiVersionString, endpoint: \"\(endpointStr)\", queryParams: queryParams) { (JSON, error) -> () in"
+        if requestMethod == .GET {
+            string += "GoogleServiceFetcher.sharedInstance.performRequest(serviceName: apiNameInURL, apiVersion: apiVersionString, endpoint: \"\(endpointStr)\", queryParams: queryParams) { (JSON, error) -> () in"
+        } else if jsonPostBodyType != nil {
+            string += "GoogleServiceFetcher.sharedInstance.performRequest(.\(requestMethod.rawValue), serviceName: apiNameInURL, apiVersion: apiVersionString, endpoint: \"\(endpointStr)\", queryParams: queryParams, postBody: Mapper<\(jsonPostBodyType!)>().toJSON(\(jsonPostBodyVarName!))) { (JSON, error) -> () in"
+        } else {
+            string += "GoogleServiceFetcher.sharedInstance.performRequest(.\(requestMethod.rawValue), serviceName: apiNameInURL, apiVersion: apiVersionString, endpoint: \"\(endpointStr)\", queryParams: queryParams) { (JSON, error) -> () in"
+        }
+        
         string.addNewLine(); string.addTab(); string.addTab(); string.addTab()
         if returnType != Types.Bool.rawValue {
             // 4.1) completionHandler

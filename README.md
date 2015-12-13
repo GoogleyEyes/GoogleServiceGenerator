@@ -9,7 +9,7 @@ This is the companion to [GoogleAPISwiftClient](https://github.com/mattwyskiel/G
 It is a simple OS X app that lists all the services Google provides APIs for, and can generate Swift classes for the selected service that fit right in with [GoogleAPISwiftClient](https://github.com/mattwyskiel/GGoogleAPISwiftClient)
 
 ## There Will Be Bugs
-This is still in the early stages, as [GGoogleAPISwiftClient](https://github.com/mattwyskiel/GGoogleAPISwiftClient) is still in the early stages. There will be bugs in code generation. The one service I have been testing on as I've initially written the app is Blogger API, v3, and I've been able to generate code for that service that generates no compiler errors (meaning: it works!!) I can now perform more broad testing with many different services. My goal is for my library to support all the same services that Google's official client library does.
+This is still in the early stages, as [GoogleAPISwiftClient](https://github.com/mattwyskiel/GGoogleAPISwiftClient) is still in the early stages. There will be bugs in code generation. The one service I have been testing on as I've initially written the app is Blogger API, v3, and I've been able to generate code for that service that generates no compiler errors (meaning: it works!!) I can now perform more broad testing with many different services. My goal is for my library to support all the same services that Google's official client library does.
 
 That's where you can help. Issues and Pull Requests are welcome, and even starring this project helps me know that it is worth working on.
 

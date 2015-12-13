@@ -8,6 +8,7 @@
 
 import Cocoa
 import GoogleAPIs
+import Alamofire
 
 class SchemaToServiceClassTransformer {
     var serviceName: String = Generator.sharedInstance.serviceName
@@ -48,11 +49,15 @@ class SchemaToServiceClassTransformer {
             // 3) Return Type
             let returnType: String? = methodInfo.responseRef != nil ? serviceName + methodInfo.responseRef.objcName(shouldCapitalize: true) : nil
             // 4) Return type Variable Name
-            let returnTypeVarname: String? = methodInfo.responseRef != nil ? methodInfo.responseRef.objcName(shouldCapitalize: false) : nil
+            let returnTypeVarname: String? = methodInfo.responseRef != nil ? methodInfo.responseRef.objcName(shouldCapitalize: false).makeCamelCaseLowerCase() : nil
             // 5) Endpoint
             let endpoint = methodInfo.path
-            // 6) put it all together
-            let method = APIMethod(name: name, parameters: parameters, returnType: returnType, returnTypeVariableName: returnTypeVarname, endpoint: endpoint, serviceClass: serviceClass)
+            // 6) Request type and var name
+            let requestType: String? = methodInfo.requestRef != nil ? serviceName + methodInfo.requestRef.objcName(shouldCapitalize: true) : nil
+            let requestTypeVarname: String? = methodInfo.requestRef != nil ? methodInfo.requestRef.objcName(shouldCapitalize: false).makeCamelCaseLowerCase(): nil
+            let requestMethod = Alamofire.Method(rawValue: methodInfo.httpMethod)!
+            // 7) put it all together
+            let method = APIMethod(name: name, requestMethod: requestMethod, parameters: parameters, jsonPostBodyType: requestType, jsonPostBodyVarName: requestTypeVarname, returnType: returnType, returnTypeVariableName: returnTypeVarname, endpoint: endpoint, serviceClass: serviceClass)
             methods.append(method)
         }
         return methods

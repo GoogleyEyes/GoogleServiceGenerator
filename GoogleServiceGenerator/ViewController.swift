@@ -67,6 +67,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
                 alert.informativeText = error.debugDescription
             }
             alert.alertStyle = NSAlertStyle.InformationalAlertStyle
+            alert.beginSheetModalForWindow(self.view.window!, completionHandler: nil)
         }
     }
     

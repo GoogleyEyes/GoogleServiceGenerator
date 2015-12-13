@@ -60,6 +60,17 @@ class Generator {
                     if let type = propertyInfo.type {
                         if type == "object" && propertyInfo.properties != nil {
                             modelItems.append(SchemaToModelClassTransformer().subModelClassFromSchema(propertyName.objcName(shouldCapitalize: true), resourceName: schemaName, schema: propertyInfo))
+                            for (name, info) in propertyInfo.properties {
+                                if let typetwo = info.type {
+                                    if typetwo == "object" && info.properties != nil {
+                                        modelItems.append(SchemaToModelClassTransformer().subModelClassFromSchema(name.objcName(shouldCapitalize: true), resourceName: schemaName + propertyName.objcName(shouldCapitalize: true), schema: info))
+                                    } else if typetwo == "array" && info.items.properties != nil {
+                                        modelItems.append(SchemaToModelClassTransformer().subModelClassFromSchema(name.objcName(shouldCapitalize: true), resourceName: schemaName + propertyName.objcName(shouldCapitalize: true), schema: info))
+                                    }
+                                } else if info.enumValues != nil {
+                                    modelItems.append(SchemaToModelEnumTransformer().enumFromSchema(name, resourceName: schemaName + propertyName.objcName(shouldCapitalize: true), propertyInfo: info))
+                                }
+                            }
                         } else if type == "array" && propertyInfo.items.properties != nil {
                             modelItems.append(SchemaToModelClassTransformer().subModelClassFromSchema(propertyName.objcName(shouldCapitalize: true), resourceName: schemaName, schema: propertyInfo))
                         }
@@ -117,6 +128,7 @@ class Generator {
                 return
             }
         }
+        completionHandler (success: true, error: nil)
     }
     
     private func completeString(items: [SourceFileGeneratable], name: String) -> String {

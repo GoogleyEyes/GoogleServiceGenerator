@@ -40,4 +40,20 @@ extension String {
         self += String.tab
         return self
     }
+    
+    func makeCamelCaseLowerCase() -> String {
+        let strInitial = self
+        var characters: [Character] = []
+        for char in strInitial.characters {
+            if char == strInitial.characters.first {
+                let charStr = String(char)
+                let lowercase = charStr.lowercaseString
+                let finalChar = lowercase.characters.first
+                characters.append(finalChar!)
+            } else {
+                characters.append(char)
+            }
+        }
+        return String(characters)
+    }
 }

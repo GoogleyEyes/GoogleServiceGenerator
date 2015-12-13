@@ -46,7 +46,12 @@ class ModelClass: SourceFileGeneratable, CustomStringConvertible {
         string += "public func mapping(map: Map) {"
         string.addNewLine(); string.addTab(); string.addTab()
         for property in properties {
-            string += "\(property.name) <- map[\"\(property.jsonName)\"]"
+            if property.type == "NSURL" || property.type == "NSDate" {
+                let type = Types.transformType(forType: Types(rawValue: property.type))!.rawValue
+                string += "\(property.name) <- (map[\"\(property.jsonName)\"], \(type)())"
+            } else {
+                string += "\(property.name) <- map[\"\(property.jsonName)\"]"
+            }
             string.addNewLine(); string.addTab()
             if property != properties[properties.endIndex - 1] {
                 string.addTab()
