@@ -10,7 +10,11 @@ import Cocoa
 
 extension String {
     func objcName(shouldCapitalize shouldCapitalize: Bool, allowLeadingDigits: Bool = false) -> String {
-        return GeneratorHelpers.objcName(self, shouldCapitalize: shouldCapitalize, allowLeadingDigits: allowLeadingDigits)
+        var vetted = GeneratorHelpers.objcName(self, shouldCapitalize: shouldCapitalize, allowLeadingDigits: allowLeadingDigits)
+        if vetted == "default" {
+            vetted = "defaultValue"
+        }
+        return vetted
     }
     
     static func objcName(components components: [String], shouldCapitalize: Bool, allowLeadingDigits: Bool = false) -> String {
@@ -55,5 +59,20 @@ extension String {
             }
         }
         return String(characters)
+    }
+    
+    func documentationString() -> String {
+        var final = ""
+        if self.componentsSeparatedByString("\n").count != 1 {
+            final += "/**"
+            for component in self.componentsSeparatedByString("\n") {
+                final.addNewLine(); final.addTab()
+                final += component
+            }
+            final += "*/"
+        } else {
+            final += "/// \(self)"
+        }
+        return final
     }
 }

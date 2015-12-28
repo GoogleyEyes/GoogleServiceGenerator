@@ -74,7 +74,7 @@ class Generator {
                         } else if type == "array" && propertyInfo.items.properties != nil {
                             modelItems.append(SchemaToModelClassTransformer().subModelClassFromSchema(propertyName.objcName(shouldCapitalize: true), resourceName: schemaName, schema: propertyInfo))
                         }
-                    } else if propertyInfo.enumValues != nil {
+                    } else if propertyInfo.enumValues != nil || propertyInfo.enumValues?.count > 0 {
                         modelItems.append(SchemaToModelEnumTransformer().enumFromSchema(propertyName, resourceName: schemaName, propertyInfo: propertyInfo))
                     }
                 }
@@ -156,7 +156,9 @@ class Generator {
         string.addNewLine()
         string += "import ObjectMapper"
         string.addNewLine(); string.addNewLine()
+        print("Items: \(items)")
         let itemSet = Set<SourceFileGeneratable>(items)
+        print("Item Set: \(itemSet)")
         for item in itemSet {
             string += item.generateSourceFileString()
             string.addNewLine(); string.addNewLine();

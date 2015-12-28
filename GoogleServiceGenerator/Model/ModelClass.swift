@@ -55,10 +55,9 @@ class ModelClass: SourceFileGeneratable, CustomStringConvertible {
             string.addNewLine(); string.addTab()
             if property != properties[properties.endIndex - 1] {
                 string.addTab()
-            } else {
-                string += "}"
             }
         }
+        string += "}"
         // 5) closing bracket
         string.addNewLine()
         string += "}"

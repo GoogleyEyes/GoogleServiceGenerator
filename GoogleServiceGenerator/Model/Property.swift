@@ -40,7 +40,7 @@ class Property: SourceFileGeneratable, CustomStringConvertible {
     override func generateSourceFileString() -> String {
         var string = ""
         if let desc = docDescription {
-            string += "/// \(desc)"
+            string += desc.documentationString()
             string.addNewLine(); string.addTab()
             string += "public var \(name): \(type)\(optionality.rawValue)"
         } else {

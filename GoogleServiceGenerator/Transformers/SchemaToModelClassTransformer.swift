@@ -17,8 +17,15 @@ class SchemaToModelClassTransformer {
         let className = serviceName + schemaName
         // 2) properties
         let properties = schema.properties != nil ? propertiesFromSchemaProperties(schema.properties, resourceName: schemaName) : []
+        // 3) superclass
+        var superclass: String
+        if schema.properties?["kind"] != nil {
+            superclass = "GoogleObject"
+        } else {
+            superclass = "Mappable"
+        }
         // 3) put it all together
-        return ModelClass(className: className, superclass: "GoogleObject", properties: properties)
+        return ModelClass(className: className, superclass: superclass, properties: properties)
     }
     
     func modelListClassFromSchema(schemaName: String, schema: DiscoveryJSONSchema) -> ModelListClass {
@@ -112,6 +119,8 @@ class SchemaToModelClassTransformer {
                     propertyType = typeName
                 } else if type == "object" && propertyInfo.properties != nil {
                     propertyType = serviceName + resourceName.objcName(shouldCapitalize: true) + propertyName.objcName(shouldCapitalize: true)
+                } else if propertyInfo.additionalProperties != nil && propertyInfo.additionalProperties.xRef != nil {
+                    propertyType = "[String: \(serviceName + propertyInfo.additionalProperties.xRef)]"
                 }
             } else if propertyInfo.xRef != nil {
                 propertyType = serviceName + propertyInfo.xRef!
