@@ -117,10 +117,7 @@ class ServiceClass: SourceFileGeneratable, CustomStringConvertible {
         for param in globalQueryParams {
             if param.defaultValue == nil {
                 string += "if let \(param.name) = \(param.name) {"
-            }
-            string.addNewLine(); string.addTab(); string.addTab()
-            if param.defaultValue == nil {
-                string.addTab()
+                string.addNewLine(); string.addTab(); string.addTab(); string.addTab()
             }
             if param.type != Types.String.rawValue && !param.isEnum {
                 string += "queryParams.updateValue(\(param.name).toJSONString(), forKey: \"\(param.name)\")"
@@ -156,11 +153,14 @@ class APIMethod: SourceFileGeneratable, CustomStringConvertible {
     var jsonPostBodyType: String?
     var jsonPostBodyVarName: String?
     
+    private var queryParams: [Property]
+    
     init(name: String, requestMethod: Alamofire.Method = .GET, parameters: [Property], jsonPostBodyType: String? = nil, jsonPostBodyVarName: String? = nil, returnType: String?, returnTypeVariableName: String? = nil, endpoint: String, serviceClass: ServiceClass) {
         self.parameters = parameters
         self.requiredParams = []
         self.serviceClass = serviceClass
         self.nonRequiredParams = []
+        self.queryParams = []
         for param in self.parameters {
             if param.required {
                 self.requiredParams.append(param)
@@ -169,6 +169,9 @@ class APIMethod: SourceFileGeneratable, CustomStringConvertible {
                     self.nonRequiredParams.append(param)
                     self.serviceClass.otherQueryParams.append(param)
                 }
+            }
+            if param.location == "query" {
+                self.queryParams.append(param)
             }
         }
         self.returnType = returnType != nil ? returnType! : Types.Bool.rawValue
@@ -210,7 +213,7 @@ class APIMethod: SourceFileGeneratable, CustomStringConvertible {
         string.addTab(); string.addTab()
         
         // 3) setUpQueryParams
-        if !nonRequiredParams.isEmpty {
+        if queryParams.count > 0 {
             string += "var queryParams = setUpQueryParams()"
         } else {
             string += "let queryParams = setUpQueryParams()"
@@ -218,13 +221,13 @@ class APIMethod: SourceFileGeneratable, CustomStringConvertible {
         
         string.addNewLine()
         string.addTab(); string.addTab()
-        for queryParam in nonRequiredParams {
-            if queryParam.defaultValue == nil {
-                string += "if let \(queryParam.name) = \(queryParam.name) {"
-            }
-            string.addNewLine(); string.addTab(); string.addTab()
-            if queryParam.defaultValue == nil {
-                string.addTab()
+        for queryParam in queryParams {
+            if !(queryParam.required) {
+                if queryParam.defaultValue == nil || queryParam.optionality != .NonOptional {
+                    string += "if let \(queryParam.name) = \(queryParam.name) {"
+                    string.addNewLine();
+                    string.addTab(); string.addTab(); string.addTab()
+                }
             }
             if queryParam.type != Types.String.rawValue && !queryParam.isEnum {
                 string += "queryParams.updateValue(\(queryParam.name).toJSONString(), forKey: \"\(queryParam.name)\")"
@@ -233,10 +236,14 @@ class APIMethod: SourceFileGeneratable, CustomStringConvertible {
             } else {
                 string += "queryParams.updateValue(\(queryParam.name), forKey: \"\(queryParam.name)\")"
             }
-            if queryParam.defaultValue == nil {
-                string.addNewLine(); string.addTab(); string.addTab()
-                string += "}"
+            
+            if !(queryParam.required) {
+                if queryParam.defaultValue == nil || queryParam.optionality != .NonOptional {
+                    string.addNewLine(); string.addTab(); string.addTab()
+                    string += "}"
+                }
             }
+            
             string.addNewLine(); string.addTab(); string.addTab()
         }
         

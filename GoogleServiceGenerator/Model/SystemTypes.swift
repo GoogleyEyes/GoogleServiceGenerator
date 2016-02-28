@@ -38,50 +38,52 @@ extension Types {
         var selfValue: Swift.String = ""
         if let type = discoveryType {
             switch type {
-        case "boolean":
-            selfValue = Types.Bool.rawValue
-        case "integer":
-            if let intFormat = format {
-                switch intFormat {
-                case "int32":
-                    selfValue = Types.Int.rawValue
-                case "uint32":
-                    selfValue = Types.UInt.rawValue
-                default:
-                    selfValue = ""
-                }
-            }
-        case "number":
-            if let numFormat = format {
-                switch numFormat {
-                case "double":
-                    selfValue = Types.Double.rawValue
-                case "float":
-                    selfValue = Types.Float.rawValue
-                default:
-                    selfValue = ""
-                }
-            }
-        case "string":
-            if let strFormat = format {
-                switch strFormat {
-                case "byte":
-                    selfValue = Types.NSURL.rawValue
-                case "date":
-                    selfValue = Types.NSDate.rawValue
-                case "date-time":
-                    selfValue = Types.NSDate.rawValue
-                case "int64":
-                    selfValue = Types.Int64.rawValue
-                case "uint64":
-                    selfValue = Types.UInt64.rawValue
+                case "boolean":
+                    selfValue = Types.Bool.rawValue
+                case "integer":
+                    if let intFormat = format {
+                        switch intFormat {
+                            case "int32":
+                                selfValue = Types.Int.rawValue
+                            case "uint32":
+                                selfValue = Types.UInt.rawValue
+                            default:
+                                selfValue = ""
+                        }
+                    }
+                case "number":
+                    if let numFormat = format {
+                        switch numFormat {
+                            case "double":
+                                selfValue = Types.Double.rawValue
+                            case "float":
+                                selfValue = Types.Float.rawValue
+                            default:
+                                selfValue = ""
+                        }
+                    }
+                case "string":
+                    if let strFormat = format {
+                        switch strFormat {
+                            case "byte":
+                                selfValue = Types.NSURL.rawValue
+                            case "date":
+                                selfValue = Types.NSDate.rawValue
+                            case "date-time":
+                                selfValue = Types.NSDate.rawValue
+                            case "int64":
+                                selfValue = Types.Int64.rawValue
+                            case "uint64":
+                                selfValue = Types.UInt64.rawValue
+                            default: selfValue = ""
+                        }
+                    } else {
+                        selfValue = Types.String.rawValue
+                    }
+                case "any":
+                    selfValue = Types.Any.rawValue
                 default: selfValue = ""
-                }
-            } else {
-                selfValue = Types.String.rawValue
             }
-        default: selfValue = ""
-        }
         }
         
         

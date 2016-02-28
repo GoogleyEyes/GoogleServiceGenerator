@@ -17,16 +17,21 @@ class Property: SourceFileGeneratable, CustomStringConvertible {
     var required: Bool
     var docDescription: String?
     var isEnum: Bool
+    var location: String?
     
-    init(nameFoundInJSONSchema jsonName: String, type: String, optionality: OptionalityOnType, transformType: String? = nil, defaultValue: String? = nil, required: Bool = false, description: String?, isEnum: Bool = false) {
+    init(nameFoundInJSONSchema jsonName: String, type: String, optionality: OptionalityOnType, transformType: String? = nil, defaultValue: String? = nil, required: Bool = false, description: String?, isEnum: Bool = false, location: String? = nil) {
         self.jsonName = jsonName
         self.type = type
         self.optionality = optionality
         self.transformType = transformType
         self.defaultValue = defaultValue
         self.required = required
+        if required {
+            self.optionality = .NonOptional
+        }
         docDescription = description
         self.isEnum = isEnum
+        self.location = location
         
         super.init()
         self.name = jsonName.objcName(shouldCapitalize: false) // edit jsonName to fit source file character restrictions

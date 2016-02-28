@@ -68,23 +68,25 @@ class ModelClass: SourceFileGeneratable, CustomStringConvertible {
 class ModelListClass: SourceFileGeneratable, CustomStringConvertible{
     var properties: [Property]
     var itemType: String
+    var listType: String
     
-    init(className: String, properties: [Property], itemType: String, itemsPropertyDescription: String) {
+    init(className: String, properties: [Property], itemType: String, itemsPropertyDescription: String, listType: String) {
         self.properties = [Property(nameFoundInJSONSchema: "items", type: "[Type]", optionality: .ImplicitlyUnwrappedOptional, description: itemsPropertyDescription)]
         self.properties.appendContentsOf(properties)
         self.itemType = itemType
+        self.listType = listType
         
         super.init()
         self.name = className
     }
     
     var description: String {
-        return "public class \(name): GoogleObjectList"
+        return "public class \(name): \(listType)"
     }
     
     override func generateSourceFileString() -> String {
         // 1) class declaration (with "{")
-        var string = "public class \(name): GoogleObjectList {"
+        var string = "public class \(name): \(listType) {"
         string.addNewLine(); string.addTab()
         
         // 2) property declarations

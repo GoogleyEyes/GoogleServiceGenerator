@@ -22,7 +22,7 @@ class SchemaToModelClassTransformer {
         if schema.properties?["kind"] != nil {
             superclass = "GoogleObject"
         } else {
-            superclass = "Mappable"
+            superclass = "ObjectType"
         }
         // 3) put it all together
         return ModelClass(className: className, superclass: superclass, properties: properties)
@@ -31,7 +31,14 @@ class SchemaToModelClassTransformer {
     func modelListClassFromSchema(schemaName: String, schema: DiscoveryJSONSchema) -> ModelListClass {
         // 1) class name
         let className = serviceName + schemaName
-        // 2) item type
+        // 2a) list type
+        let listType: String
+        if schema.properties?["kind"] != nil {
+            listType = "GoogleObjectList"
+        } else {
+            listType = "ListType"
+        }
+        // 2b) item type
         let itemType = serviceName + schema.properties["items"]!.items.xRef!
         // 3) properties
         var properties = propertiesFromSchemaProperties(schema.properties, resourceName: "")
@@ -44,7 +51,7 @@ class SchemaToModelClassTransformer {
         // 4) items description
         let itemsDescription = schema.properties["items"]!.schemaDescription
         // 4) put it all together
-        return ModelListClass(className: className, properties: properties, itemType: itemType, itemsPropertyDescription: itemsDescription)
+        return ModelListClass(className: className, properties: properties, itemType: itemType, itemsPropertyDescription: itemsDescription, listType: listType)
     }
     
     private func weedOutItemsProperties(array: [Property]) -> [Property] {
@@ -74,7 +81,7 @@ class SchemaToModelClassTransformer {
             properties = propertiesFromSchemaProperties(schema.items.properties, resourceName: resourceName)
         }
         // 3) put it all together
-        return ModelClass(className: className, superclass: Types.Mappable.rawValue, properties: properties)
+        return ModelClass(className: className, superclass: "ObjectType", properties: properties)
     }
     
     func subModelClassForArrayValueTypeObjectFromSchema(schemaName: String, resourceName: String, schema: DiscoveryJSONSchema) -> ModelClass {
@@ -84,7 +91,7 @@ class SchemaToModelClassTransformer {
         var properties: [Property] = []
         properties = propertiesFromSchemaProperties(schema.items.properties, resourceName: resourceName)
         // 3) put it all together
-        return ModelClass(className: className, superclass: Types.Mappable.rawValue, properties: properties)
+        return ModelClass(className: className, superclass: "ObjectType", properties: properties)
     }
     
     func propertiesFromSchemaProperties(schemaProperties: [String: DiscoveryJSONSchema], resourceName: String) -> [Property] {
@@ -147,8 +154,11 @@ class SchemaToModelClassTransformer {
             // 7) Description
             let desc = propertyInfo.schemaDescription
             
-            // 8) put it all together
-            let property = Property(nameFoundInJSONSchema: propertyName, type: propertyType, optionality: optionality, transformType: transformType, defaultValue: defaultValue, required: required, description: desc, isEnum: isEnum)
+            // 8) location in request (either query or path)
+            let location = propertyInfo.location
+            
+            // 9) put it all together
+            let property = Property(nameFoundInJSONSchema: propertyName, type: propertyType, optionality: optionality, transformType: transformType, defaultValue: defaultValue, required: required, description: desc, isEnum: isEnum, location: location)
             properties.append(property)
         }
         return properties
