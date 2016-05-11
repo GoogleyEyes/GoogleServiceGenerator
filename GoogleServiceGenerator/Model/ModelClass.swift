@@ -42,6 +42,12 @@ class ModelClass: SourceFileGeneratable, CustomStringConvertible {
         string += "}"
         // line break
         string.addNewLine(); string.addNewLine(); string.addTab()
+        // 3) init()
+        string += "public init() {"
+        string.addNewLine(); string.addNewLine(); string.addTab()
+        string += "}"
+        // line break
+        string.addNewLine(); string.addNewLine(); string.addTab()
         // 4) mapping(map:)
         string += "public func mapping(map: Map) {"
         string.addNewLine(); string.addTab(); string.addTab()
@@ -100,6 +106,13 @@ class ModelListClass: SourceFileGeneratable, CustomStringConvertible{
         
         // 3) mappable init?()
         string += "public required init?(_ map: Map) {"
+        string.addNewLine(); string.addNewLine(); string.addTab()
+        string += "}"
+        // line break
+        string.addNewLine(); string.addNewLine(); string.addTab()
+        
+        // 3) init()
+        string += "public init() {"
         string.addNewLine(); string.addNewLine(); string.addTab()
         string += "}"
         // line break

@@ -56,8 +56,10 @@ class SchemaToServiceClassTransformer {
             let requestType: String? = methodInfo.requestRef != nil ? serviceName + methodInfo.requestRef.objcName(shouldCapitalize: true) : nil
             let requestTypeVarname: String? = methodInfo.requestRef != nil ? methodInfo.requestRef.objcName(shouldCapitalize: false).makeCamelCaseLowerCase(): nil
             let requestMethod = Alamofire.Method(rawValue: methodInfo.httpMethod)!
-            // 7) put it all together
-            let method = APIMethod(name: name, requestMethod: requestMethod, parameters: parameters, jsonPostBodyType: requestType, jsonPostBodyVarName: requestTypeVarname, returnType: returnType, returnTypeVariableName: returnTypeVarname, endpoint: endpoint, serviceClass: serviceClass)
+            // 7) supports media uploads
+            let supportsMediaUploads = methodInfo.supportsMediaUpload != nil ? methodInfo.supportsMediaUpload : false
+            // 8) put it all together
+            let method = APIMethod(name: name, requestMethod: requestMethod, parameters: parameters, jsonPostBodyType: requestType, jsonPostBodyVarName: requestTypeVarname, supportsMediaUpload: supportsMediaUploads, returnType: returnType, returnTypeVariableName: returnTypeVarname, endpoint: endpoint, serviceClass: serviceClass)
             methods.append(method)
         }
         return methods

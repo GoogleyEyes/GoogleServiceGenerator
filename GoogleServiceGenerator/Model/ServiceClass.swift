@@ -152,10 +152,11 @@ class APIMethod: SourceFileGeneratable, CustomStringConvertible {
     var requestMethod: Alamofire.Method
     var jsonPostBodyType: String?
     var jsonPostBodyVarName: String?
+    var supportsMediaUpload: Bool
     
     private var queryParams: [Property]
     
-    init(name: String, requestMethod: Alamofire.Method = .GET, parameters: [Property], jsonPostBodyType: String? = nil, jsonPostBodyVarName: String? = nil, returnType: String?, returnTypeVariableName: String? = nil, endpoint: String, serviceClass: ServiceClass) {
+    init(name: String, requestMethod: Alamofire.Method = .GET, parameters: [Property], jsonPostBodyType: String? = nil, jsonPostBodyVarName: String? = nil, supportsMediaUpload: Bool = false, returnType: String?, returnTypeVariableName: String? = nil, endpoint: String, serviceClass: ServiceClass) {
         self.parameters = parameters
         self.requiredParams = []
         self.serviceClass = serviceClass
@@ -186,7 +187,7 @@ class APIMethod: SourceFileGeneratable, CustomStringConvertible {
             newReqPar.appendContentsOf(reqpar)
             self.requiredParams = newReqPar
         }
-        
+        self.supportsMediaUpload = supportsMediaUpload
         
         super.init()
         self.name = name
@@ -250,12 +251,18 @@ class APIMethod: SourceFileGeneratable, CustomStringConvertible {
         // 4) performRequest
         let endpointStr = endpoint.stringByReplacingOccurrencesOfString("{", withString: "\\(").stringByReplacingOccurrencesOfString("}", withString: ")")
         if requestMethod == .GET {
-            string += "GoogleServiceFetcher.sharedInstance.performRequest(serviceName: apiNameInURL, apiVersion: apiVersionString, endpoint: \"\(endpointStr)\", queryParams: queryParams) { (JSON, error) -> () in"
+            string += "GoogleServiceFetcher.sharedInstance.performRequest(serviceName: apiNameInURL, apiVersion: apiVersionString, endpoint: \"\(endpointStr)\", queryParams: queryParams"
         } else if jsonPostBodyType != nil {
-            string += "GoogleServiceFetcher.sharedInstance.performRequest(.\(requestMethod.rawValue), serviceName: apiNameInURL, apiVersion: apiVersionString, endpoint: \"\(endpointStr)\", queryParams: queryParams, postBody: Mapper<\(jsonPostBodyType!)>().toJSON(\(jsonPostBodyVarName!))) { (JSON, error) -> () in"
+            string += "GoogleServiceFetcher.sharedInstance.performRequest(.\(requestMethod.rawValue), serviceName: apiNameInURL, apiVersion: apiVersionString, endpoint: \"\(endpointStr)\", queryParams: queryParams, postBody: Mapper<\(jsonPostBodyType!)>().toJSON(\(jsonPostBodyVarName!))"
         } else {
-            string += "GoogleServiceFetcher.sharedInstance.performRequest(.\(requestMethod.rawValue), serviceName: apiNameInURL, apiVersion: apiVersionString, endpoint: \"\(endpointStr)\", queryParams: queryParams) { (JSON, error) -> () in"
+            string += "GoogleServiceFetcher.sharedInstance.performRequest(.\(requestMethod.rawValue), serviceName: apiNameInURL, apiVersion: apiVersionString, endpoint: \"\(endpointStr)\", queryParams: queryParams"
         }
+        
+        if supportsMediaUpload {
+            string += ", uploadParameters: uploadParameters"
+        }
+        
+        string += ") { (JSON, error) -> () in"
         
         string.addNewLine(); string.addTab(); string.addTab(); string.addTab()
         if returnType != Types.Bool.rawValue {
@@ -319,7 +326,13 @@ class APIMethod: SourceFileGeneratable, CustomStringConvertible {
             }
         }
         
-        // 3) completion handler
+        // 3) supports media uploads
+        if supportsMediaUpload {
+            string += "uploadParameters: UploadParameters"
+            string += ", "
+        }
+        
+        // 4) completion handler
         string += "completionHandler: (\(returnTypeVariableName): \(returnType)?, error: ErrorType?) -> ())"
         
         return string
