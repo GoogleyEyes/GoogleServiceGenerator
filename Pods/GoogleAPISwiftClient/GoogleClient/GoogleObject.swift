@@ -9,30 +9,40 @@
 import Foundation
 import ObjectMapper
 
-public protocol GoogleObject: Mappable {
+public protocol ObjectType: Mappable {
+
+}
+
+public protocol GoogleObject: ObjectType {
     var kind: String { get }
 }
 
-public protocol GoogleObjectList: GoogleObject, SequenceType {
-    typealias Type: GoogleObject
+public protocol ListType: ObjectType, SequenceType {
+    associatedtype Type: ObjectType
     var items: [Type]! { get }
 }
 
-extension GoogleObjectList {
-    
+extension ListType {
+
     public func generate() -> IndexingGenerator<[Type]> {
         let objects = items as [Type]
         return objects.generate()
     }
-    
+
     public subscript(position: Int) -> Type {
         return items[position]
     }
+}
+public protocol GoogleObjectList: GoogleObject, ListType {
+
 }
 
 class RFC3339Transform: TransformType {
 
     func transformFromJSON(value: AnyObject?) -> NSDate? {
+
+        guard value != nil else { return nil }
+
         // Create date formatter
         //        NSDateFormatter *dateFormatter = nil;
         //        if (!dateFormatter) {
@@ -78,6 +88,7 @@ class RFC3339Transform: TransformType {
     }
 
     func transformToJSON(value: NSDate?) -> String? {
+        guard value != nil else { return nil }
         let en_US_POSIX = NSLocale(localeIdentifier: "en_US_POSIX")
         let dateFormatter = NSDateFormatter()
         dateFormatter.locale = en_US_POSIX
@@ -102,15 +113,5 @@ class RFC3339Transform: TransformType {
         }
 
         return string;
-    }
-}
-
-extension Bool {
-    func toJSONAndQueryString() -> String {
-        if boolValue {
-            return "true"
-        } else {
-            return "false"
-        }
     }
 }

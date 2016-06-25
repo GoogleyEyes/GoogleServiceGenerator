@@ -14,8 +14,9 @@ class ServiceClass: SourceFileGeneratable, CustomStringConvertible {
     var globalQueryParams: [Property]
     var otherQueryParams: [Property] = []
     var apiMethods: [APIMethod] = []
+    var classDescription: String
     
-    init(className: String, apiName: String, apiVersion: String, globalQueryParams: [Property]) {
+    init(className: String, apiName: String, apiVersion: String, globalQueryParams: [Property], classDescription: String) {
         self.apiName = apiName
         self.apiVersion = apiVersion
         self.globalQueryParams = []
@@ -24,6 +25,7 @@ class ServiceClass: SourceFileGeneratable, CustomStringConvertible {
                 self.globalQueryParams.append(param)
             }
         }
+        self.classDescription = classDescription
         
         super.init()
         self.name = className
@@ -35,7 +37,9 @@ class ServiceClass: SourceFileGeneratable, CustomStringConvertible {
     
     override func generateSourceFileString() -> String {
         // 1) class declaration
-        var string = "public class \(name): GoogleService {"
+        var string = classDescription.documentationString()
+        string.addNewLine()
+        string += "public class \(name): GoogleService {"
         string.addNewLine(); string.addTab()
         
         // 2) GoogleService conformance
@@ -43,8 +47,8 @@ class ServiceClass: SourceFileGeneratable, CustomStringConvertible {
         string.addNewLine(); string.addNewLine(); string.addTab()
         
         // 3) global query params
-        for param in globalQueryParams {
-            string += "\(param)"
+        for queryParam in globalQueryParams {
+            string += "\(queryParam)"
             string.addNewLine(); string.addTab()
         }
         string.addNewLine(); string.addTab()
@@ -71,40 +75,14 @@ class ServiceClass: SourceFileGeneratable, CustomStringConvertible {
         string += "var apiVersionString: String = \"\(apiVersion)\""
         string.addNewLine(); string.addNewLine(); string.addTab()
         
-        // 3) accessToken
-        string += "/// OAuth 2.0 token for the current user."
-        string.addNewLine(); string.addTab()
-        string += "public var accessToken: String? {"
-        string.addNewLine(); string.addTab(); string.addTab()
-        string += "didSet {"
-        string.addNewLine(); string.addTab(); string.addTab(); string.addTab()
-        string += "GoogleServiceFetcher.sharedInstance.accessToken = accessToken"
-        string.addNewLine(); string.addTab(); string.addTab()
-        string += "}"
-        string.addNewLine(); string.addTab()
-        string += "}"
-        string.addNewLine(); string.addTab()
+        // 5) fetcher
+        string += "public let fetcher: GoogleServiceFetcher = GoogleServiceFetcher()"
+        string.addNewLine(); string.addNewLine(); string.addTab()
         
-        // 4) apiKey
-        string += "/// API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token."
-        string.addNewLine(); string.addTab()
-        string += "public var apiKey: String? {"
-        string.addNewLine(); string.addTab(); string.addTab()
-        string += "didSet {"
-        string.addNewLine(); string.addTab(); string.addTab(); string.addTab()
-        string += "GoogleServiceFetcher.sharedInstance.apiKey = apiKey"
-        string.addNewLine(); string.addTab(); string.addTab()
-        string += "}"
-        string.addNewLine(); string.addTab()
-        string += "}"
-        string.addNewLine(); string.addTab()
-        
-        // 5) sharedInstance and private init()
-        string += "public static let sharedInstance = \(name)()"
-        string.addNewLine(); string.addTab()
-        string += "private init() {"
+        string += "public required init() {"
         string.addNewLine(); string.addNewLine(); string.addTab()
         string += "}"
+        
         
         return string
     }
@@ -120,11 +98,11 @@ class ServiceClass: SourceFileGeneratable, CustomStringConvertible {
                 string.addNewLine(); string.addTab(); string.addTab(); string.addTab()
             }
             if param.type != Types.String.rawValue && !param.isEnum {
-                string += "queryParams.updateValue(\(param.name).toJSONString(), forKey: \"\(param.name)\")"
+                string += "queryParams.updateValue(\(param.name).toJSONString(), forKey: \"\(param.jsonName)\")"
             } else if param.isEnum {
-                string += "queryParams.updateValue(\(param.name).rawValue, forKey: \"\(param.name)\")"
+                string += "queryParams.updateValue(\(param.name).rawValue, forKey: \"\(param.jsonName)\")"
             } else {
-                string += "queryParams.updateValue(\(param.name), forKey: \"\(param.name)\")"
+                string += "queryParams.updateValue(\(param.name), forKey: \"\(param.jsonName)\")"
             }
             if param.defaultValue == nil {
                 string.addNewLine(); string.addTab(); string.addTab()
@@ -153,10 +131,13 @@ class APIMethod: SourceFileGeneratable, CustomStringConvertible {
     var jsonPostBodyType: String?
     var jsonPostBodyVarName: String?
     var supportsMediaUpload: Bool
+    var methodId: String
+    
+    var methodDescription: String
     
     private var queryParams: [Property]
     
-    init(name: String, requestMethod: Alamofire.Method = .GET, parameters: [Property], jsonPostBodyType: String? = nil, jsonPostBodyVarName: String? = nil, supportsMediaUpload: Bool = false, returnType: String?, returnTypeVariableName: String? = nil, endpoint: String, serviceClass: ServiceClass) {
+    init(name: String, requestMethod: Alamofire.Method = .GET, parameters: [Property], jsonPostBodyType: String? = nil, jsonPostBodyVarName: String? = nil, supportsMediaUpload: Bool = false, returnType: String?, returnTypeVariableName: String? = nil, endpoint: String, serviceClass: ServiceClass, description: String, methodId: String) {
         self.parameters = parameters
         self.requiredParams = []
         self.serviceClass = serviceClass
@@ -189,6 +170,9 @@ class APIMethod: SourceFileGeneratable, CustomStringConvertible {
         }
         self.supportsMediaUpload = supportsMediaUpload
         
+        self.methodDescription = description
+        self.methodId = methodId
+        
         super.init()
         self.name = name
     }
@@ -209,6 +193,8 @@ class APIMethod: SourceFileGeneratable, CustomStringConvertible {
         }
         
         // 2) Method name
+        string += methodDescription.documentationString()
+        string.addNewLine(); string.addTab()
         string += generateMethodName() + " {"
         string.addNewLine()
         string.addTab(); string.addTab()
@@ -224,7 +210,7 @@ class APIMethod: SourceFileGeneratable, CustomStringConvertible {
         string.addTab(); string.addTab()
         for queryParam in queryParams {
             if !(queryParam.required) {
-                if queryParam.defaultValue == nil || queryParam.optionality != .NonOptional {
+                if !(queryParam.hasDefaultValue) {
                     string += "if let \(queryParam.name) = \(queryParam.name) {"
                     string.addNewLine();
                     string.addTab(); string.addTab(); string.addTab()
@@ -239,7 +225,7 @@ class APIMethod: SourceFileGeneratable, CustomStringConvertible {
             }
             
             if !(queryParam.required) {
-                if queryParam.defaultValue == nil || queryParam.optionality != .NonOptional {
+                if !(queryParam.hasDefaultValue) {
                     string.addNewLine(); string.addTab(); string.addTab()
                     string += "}"
                 }
@@ -251,11 +237,11 @@ class APIMethod: SourceFileGeneratable, CustomStringConvertible {
         // 4) performRequest
         let endpointStr = endpoint.stringByReplacingOccurrencesOfString("{", withString: "\\(").stringByReplacingOccurrencesOfString("}", withString: ")")
         if requestMethod == .GET {
-            string += "GoogleServiceFetcher.sharedInstance.performRequest(serviceName: apiNameInURL, apiVersion: apiVersionString, endpoint: \"\(endpointStr)\", queryParams: queryParams"
+            string += "fetcher.performRequest(serviceName: apiNameInURL, apiVersion: apiVersionString, endpoint: \"\(endpointStr)\", queryParams: queryParams"
         } else if jsonPostBodyType != nil {
-            string += "GoogleServiceFetcher.sharedInstance.performRequest(.\(requestMethod.rawValue), serviceName: apiNameInURL, apiVersion: apiVersionString, endpoint: \"\(endpointStr)\", queryParams: queryParams, postBody: Mapper<\(jsonPostBodyType!)>().toJSON(\(jsonPostBodyVarName!))"
+            string += "fetcher.performRequest(.\(requestMethod.rawValue), serviceName: apiNameInURL, apiVersion: apiVersionString, endpoint: \"\(endpointStr)\", queryParams: queryParams, postBody: Mapper<\(jsonPostBodyType!)>().toJSON(\(jsonPostBodyVarName!))"
         } else {
-            string += "GoogleServiceFetcher.sharedInstance.performRequest(.\(requestMethod.rawValue), serviceName: apiNameInURL, apiVersion: apiVersionString, endpoint: \"\(endpointStr)\", queryParams: queryParams"
+            string += "fetcher.performRequest(.\(requestMethod.rawValue), serviceName: apiNameInURL, apiVersion: apiVersionString, endpoint: \"\(endpointStr)\", queryParams: queryParams"
         }
         
         if supportsMediaUpload {
@@ -304,19 +290,48 @@ class APIMethod: SourceFileGeneratable, CustomStringConvertible {
     }
     
     private func generateMethodName() -> String {
+        
         // 1) initial method name
-        var string = "public func \(name)("
+        var string = "public func "
+        
+        if let overridenMethodName = OverrideFileManager.overrideAPIMethodFullName(methodId) {
+            return string + overridenMethodName
+        }
+        
+        string += "\(name)("
+        
+        let overrideParamNames = OverrideFileManager.overrideAPIMethodParameterNames(methodId)
         
         // 2) required parameters
         if !requiredParams.isEmpty {
             for param in requiredParams {
                 if param == requiredParams.first! {
-                    string += "\(param.name) \(param.name): \(param.type)\(param.optionality.rawValue)"
+                    
+                    let firstParamName: String?
+                    if let override = overrideParamNames?[0] {
+                        if override != "_" {
+                            firstParamName = override
+                        } else {
+                            firstParamName = nil
+                        }
+                    } else {
+                        firstParamName = param.name
+                    }
+                    if firstParamName != nil {
+                        string += "\(firstParamName!) "
+                    }
+                        
+                    string += "\(param.name): \(param.type)\(param.optionality.rawValue)"
                     if param.defaultValue != nil {
                         string += " = \(param.defaultValue)"
                     }
                     string += ", "
                 } else {
+                    
+                    if let overrideParamName = overrideParamNames?[requiredParams.indexOf(param)!] {
+                        string += "\(overrideParamName) "
+                    }
+                    
                     string += "\(param.name): \(param.type)\(param.optionality.rawValue)"
                     if param.defaultValue != nil {
                         string += " = \(param.defaultValue)"
@@ -333,7 +348,7 @@ class APIMethod: SourceFileGeneratable, CustomStringConvertible {
         }
         
         // 4) completion handler
-        string += "completionHandler: (\(returnTypeVariableName): \(returnType)?, error: ErrorType?) -> ())"
+        string += "completionHandler: (\(returnTypeVariableName): \(returnType)?, error: NSError?) -> ())"
         
         return string
     }

@@ -1,0 +1,250 @@
+{
+  "modelClasses": {
+    "BloggerCommentAuthor": {
+      "properties": {
+        "image": {
+          "type": "BloggerCommentAuthorImage"
+        }
+      }
+    },
+    "BloggerPageAuthor": {
+      "properties": {
+        "image": {
+          "type": "BloggerPageAuthorImage"
+        }
+      }
+    }
+  },
+  "enums": {
+    "alt": {
+      "json": "JSON"
+    },
+    "posts.view": {
+      "ADMIN": "Admin",
+      "AUTHOR": "Author",
+      "READER": "Reader"
+    },
+    "blogs.view": {
+      "ADMIN": "Admin",
+      "AUTHOR": "Author",
+      "READER": "Reader"
+    },
+    "pages.view": {
+      "ADMIN": "Admin",
+      "AUTHOR": "Author",
+      "READER": "Reader"
+    },
+    "comments.view": {
+      "ADMIN": "Admin",
+      "AUTHOR": "Author",
+      "READER": "Reader"
+    },
+    "postUserInfos.view": {
+      "ADMIN": "Admin",
+      "AUTHOR": "Author",
+      "READER": "Reader"
+    },
+    "blogs.role": {
+      "ADMIN": "Admin",
+      "AUTHOR": "Author",
+      "READER": "Reader"
+    },
+    "blogs.status": {
+      "DELETED": "Deleted",
+      "LIVE": "Live"
+    },
+    "pageViews.range": {
+      "30DAYS": "X30Days",
+      "7DAYS": "X7Days"
+    }
+  },
+  "serviceClass": {
+    "params": {
+      "quotaUser": {
+        "name": "quotaUserId"
+      },
+      "alt": {
+        "defaultValue": ".JSON"
+      }
+    },
+    "methods": {
+      "postUserInfos.list": {
+        "queryParams": {
+            "orderBy": {
+                "defaultValue": ".Published"
+            }
+        },
+        "paramNames": {
+          "0": "forUserId"
+        }
+      },
+      "postUserInfos.get": {
+        "baseName": "getPostUserInfo",
+        "paramNames": {
+          "0": "forUserId"
+        }
+      },
+      "pageViews.get": {
+        "paramNames": {
+          "0": "forBlogWithId"
+        }
+      },
+      "posts.insert": {
+        "baseName": "insertPost",
+        "paramNames": {
+          "0": "_",
+          "1": "toBlogWithId"
+        }
+      },
+      "posts.publish": {
+        "fullMethodName": "publishPost(withId postId: String, toBlogWithId blogId: String, completionHandler: (post: BloggerPost?, error: NSError?) -> ())"
+      },
+      "posts.delete": {
+        "fullMethodName": "deletePost(withId postId: String, fromBlogWithId blogId: String, completionHandler: (success: Bool, error: NSError?) -> ())"
+      },
+      "posts.patch": {
+        "baseName": "patchPost",
+        "paramNames": {
+          "0": "_",
+          "1": "forPostID"
+        }
+      },
+      "posts.getByPath": {
+        "baseName": "getPost",
+        "paramNames": {
+          "0": "byPath"
+        }
+      },
+      "posts.update": {
+        "baseName": "updatePost",
+        "paramNames": {
+          "0": "_",
+          "1": "withPostId"
+        }
+      },
+      "posts.get": {
+        "fullMethodName": "getPost(withId postId: String, blogId: String, completionHandler: (post: BloggerPost?, error: NSError?) -> ())"
+      },
+      "posts.revert": {
+        "fullMethodName": "revertPost(withId postId: String, blogId: String, completionHandler: (post: BloggerPost?, error: NSError?) -> ())"
+      },
+      "posts.search": {
+        "paramNames": {
+          "0": "query"
+        }
+      },
+      "users.get": {
+        "baseName": "getUser",
+        "paramNames": {
+          "0": "withId"
+        }
+      },
+      "comments.markAsSpam": {
+        "fullMethodName": "markCommentAsSpam(withId commentId: String, inPostWithId postId: String, blogId: String, completionHandler: (comment: BloggerComment?, error: NSError?) -> ())"
+      },
+      "comments.removeContent": {
+        "fullMethodName": "removeContentFromComment(withId commentId: String, inPostWithId postId: String, blogId: String, completionHandler: (comment: BloggerComment?, error: NSError?) -> ())"
+      },
+      "comments.delete": {
+        "fullMethodName": "deleteComment(withId commentId: String, fromPostWithId postId: String, blogId: String, completionHandler: (success: Bool?, error: NSError?) -> ())"
+      },
+      "comments.get": {
+        "baseName": "getComment",
+        "paramNames": {
+          "0": "forId"
+        }
+      },
+      "comments.list": {
+        "paramNames": {
+          "0": "forPostWithId"
+        },
+        "queryParams": {
+          "fetchBodies": {
+            "hasDefaultValue": true
+          }
+        }
+      },
+      "comments.approve": {
+        "fullMethodName": "approveComment(withId commentId: String, forPostWithId postId: String, blogId: String, completionHandler: (comment: BloggerComment?, error: NSError?) -> ())"
+      },
+      "comments.listByBlog": {
+        "baseName": "listComments",
+        "paramNames": {
+          "0": "forBlogWithId"
+        },
+        "queryParams": {
+          "fetchBodies": {
+            "hasDefaultValue": true
+          }
+        }
+      },
+      "blogs.get": {
+        "baseName": "getBlog",
+        "paramNames": {
+          "0": "forId"
+        }
+      },
+      "blogs.listByUser": {
+        "baseName": "listBlogs",
+        "paramNames": {
+          "0": "forUserWithId"
+        }
+      },
+      "blogs.getByUrl": {
+        "baseName": "getBlog",
+        "paramNames": {
+          "0": "fromURL"
+        }
+      },
+      "pages.insert": {
+        "baseName": "insertPage",
+        "paramNames": {
+          "0": "_",
+          "1": "toBlogWithId"
+        }
+      },
+      "pages.publish": {
+        "fullMethodName": "publishPage(withId pageId: String, toBlogWithId blogId: String, completionHandler: (page: BloggerPage?, error: NSError?) -> ())"
+      },
+      "pages.delete": {
+        "fullMethodName": "deletePage(withId pageId: String, fromBlogWithId blogId: String, completionHandler: (success: Bool, error: NSError?) -> ())"
+      },
+      "pages.patch": {
+        "baseName": "patchPage",
+        "paramNames": {
+          "0": "_",
+          "1": "forPageWithId"
+        }
+      },
+      "pages.update": {
+        "baseName": "updatePage",
+        "paramNames": {
+          "0": "_",
+          "1": "forPageWithId"
+        }
+      },
+      "pages.get": {
+        "fullMethodName": "getPage(forId pageId: String, fromBlogWithId blogId: String, completionHandler: (page: BloggerPage?, error: NSError?) -> ())"
+      },
+      "pages.revert": {
+        "fullMethodName": "revertPage(withId pageId: String, inBlogWithId blogId: String, completionHandler: (page: BloggerPage?, error: NSError?) -> ())"
+      },
+      "pages.list": {
+        "paramNames": {
+          "0": "forBlogWithId"
+        },
+        "queryParams": {
+          "fetchBodies": {
+            "hasDefaultValue": true
+          }
+        }
+      },
+      "blogUserInfos.get": {
+        "baseName": "getBlogUserInfo",
+        "paramNames": {
+          "0": "forBlogWithId"
+        }
+      }
+    }
+  }
+}

@@ -20,7 +20,9 @@ class Generator {
     func generate(serviceName name: String, version: String, destinationPath: String, completionHandler: (success: Bool, error: ErrorType?) -> ()) {
         folder = destinationPath
         
-        Discovery.sharedInstance.getDiscoveryDocument(forAPI: name, version: version, completionHandler: { (restDescription, error) -> () in
+        loadOverrideFile(name)
+        
+        Discovery().getDiscoveryDocument(forAPI: name, version: version, completionHandler: { (restDescription, error) -> () in
             if error != nil {
                 completionHandler(success: false, error: error)
                 return

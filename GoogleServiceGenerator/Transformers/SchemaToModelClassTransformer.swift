@@ -16,16 +16,22 @@ class SchemaToModelClassTransformer {
         // 1) class name
         let className = serviceName + schemaName
         // 2) properties
-        let properties = schema.properties != nil ? propertiesFromSchemaProperties(schema.properties, resourceName: schemaName) : []
+        let properties = schema.properties != nil ? propertiesFromSchemaProperties(schema.properties, resourceName: schemaName, className: className) : []
         // 3) superclass
         var superclass: String
         if schema.properties?["kind"] != nil {
-            superclass = "GoogleObject"
+            if schema.properties?["kind"]?.defaultValue != nil {
+                superclass = "GoogleObject"
+            } else {
+                superclass = "ObjectType"
+            }
         } else {
             superclass = "ObjectType"
         }
-        // 3) put it all together
-        return ModelClass(className: className, superclass: superclass, properties: properties)
+        // 4) description
+        let description = "The \(schemaName) model type for use with the \(serviceName) API"
+        // 5) put it all together
+        return ModelClass(className: className, superclass: superclass, properties: properties, description: description)
     }
     
     func modelListClassFromSchema(schemaName: String, schema: DiscoveryJSONSchema) -> ModelListClass {
@@ -41,7 +47,7 @@ class SchemaToModelClassTransformer {
         // 2b) item type
         let itemType = serviceName + schema.properties["items"]!.items.xRef!
         // 3) properties
-        var properties = propertiesFromSchemaProperties(schema.properties, resourceName: "")
+        var properties = propertiesFromSchemaProperties(schema.properties, resourceName: "", className: className)
         let itemProperties = weedOutItemsProperties(properties)
         for property in itemProperties {
             if property.type != "[Type]" {
@@ -76,12 +82,14 @@ class SchemaToModelClassTransformer {
         // 2) properties
         var properties: [Property] = []
         if schema.properties != nil {
-            properties = propertiesFromSchemaProperties(schema.properties, resourceName: resourceName)
+            properties = propertiesFromSchemaProperties(schema.properties, resourceName: resourceName, className: className)
         } else if schema.items.type == "object" && schema.items.properties != nil {
-            properties = propertiesFromSchemaProperties(schema.items.properties, resourceName: resourceName)
+            properties = propertiesFromSchemaProperties(schema.items.properties, resourceName: resourceName, className: className)
         }
-        // 3) put it all together
-        return ModelClass(className: className, superclass: "ObjectType", properties: properties)
+        // 3) description
+        let description = "The \(schemaName) subtype of the \(resourceName.objcName(shouldCapitalize: true)) model type for use with the \(serviceName) API"
+        // 4) put it all together
+        return ModelClass(className: className, superclass: "ObjectType", properties: properties, description: description)
     }
     
     func subModelClassForArrayValueTypeObjectFromSchema(schemaName: String, resourceName: String, schema: DiscoveryJSONSchema) -> ModelClass {
@@ -89,76 +97,93 @@ class SchemaToModelClassTransformer {
         let className = serviceName + resourceName.objcName(shouldCapitalize: true) + schemaName
         // 2) properties
         var properties: [Property] = []
-        properties = propertiesFromSchemaProperties(schema.items.properties, resourceName: resourceName)
-        // 3) put it all together
-        return ModelClass(className: className, superclass: "ObjectType", properties: properties)
+        properties = propertiesFromSchemaProperties(schema.items.properties, resourceName: resourceName, className: className)
+        // 3) description
+        let description = "The \(schemaName) subtype of the \(resourceName.objcName(shouldCapitalize: true)) model type for use with the \(serviceName) API"
+        // 4) put it all together
+        return ModelClass(className: className, superclass: "ObjectType", properties: properties, description: description)
     }
     
-    func propertiesFromSchemaProperties(schemaProperties: [String: DiscoveryJSONSchema], resourceName: String) -> [Property] {
+    func generateProperty(forName name: String, info: DiscoveryJSONSchema, resourceName: String) -> Property {
+        // 1) property type
+        var propertyType = ""
+        // 2) isEnum
+        var isEnum: Bool = false
+        if info.enumValues != nil {
+            propertyType = serviceName + resourceName.objcName(shouldCapitalize: true) + name.objcName(shouldCapitalize: true)
+            isEnum = true
+        } else if let typeEnumType = Types.type(forDiscoveryType: info.type, format: info.format) {
+            if info.enumValues == nil {
+                propertyType = typeEnumType.rawValue
+            }
+        } else if let type = info.type {
+            if type == "array" {
+                var typeName: String = ""
+                if let arrayType = info.items.xRef { // array of object already declared
+                    typeName = "[\(serviceName + arrayType)]"
+                } else if info.properties != nil || info.items.properties != nil { // array of a new type of object
+                    var name = serviceName + resourceName.objcName(shouldCapitalize: true) + name.objcName(shouldCapitalize: true)
+                    if name.characters.last == "s" {
+                        name = String(name.characters.dropLast())
+                    }
+                    typeName = "[\(name)]"
+                } else if info.items.type != nil && info.items.type != "object" { // array of primitive
+                    let name = (Types.type(forDiscoveryType: info.items.type, format: info.items.format)?.rawValue)!
+                    typeName = "[\(name)]"
+                }
+                propertyType = typeName
+            } else if type == "object" && info.properties != nil {
+                propertyType = serviceName + resourceName.objcName(shouldCapitalize: true) + name.objcName(shouldCapitalize: true)
+            } else if info.additionalProperties != nil && info.additionalProperties.xRef != nil {
+                propertyType = "[String: \(serviceName + info.additionalProperties.xRef)]"
+            }
+        } else if info.xRef != nil {
+            propertyType = serviceName + info.xRef!
+        }
+        // 3) Transform Type
+        let transformType = Types.transformType(forType: Types(rawValue: propertyType))?.rawValue
+        // 4) Default Value
+        var defaultValue = info.defaultValue
+        if defaultValue != nil {
+            if info.enumValues != nil {
+                defaultValue = ".\(info.defaultValue!.objcName(shouldCapitalize: true))"
+            } else if propertyType == Types.String.rawValue {
+                defaultValue = "\"\(info.defaultValue!)\""
+            }
+        }
+        
+        // 5) Optionality
+        var optionality = OptionalityOnType.ImplicitlyUnwrappedOptional
+        if defaultValue != nil {
+            optionality = OptionalityOnType.NonOptional
+        }
+        // 6) Required
+        let required = (info.required != nil) ? true : false
+        // 7) Description
+        let desc = info.schemaDescription
+        
+        // 8) location in request (either query or path)
+        let location = info.location
+        
+        // 9) put it all together
+        return Property(nameFoundInJSONSchema: name, type: propertyType, optionality: optionality, transformType: transformType, defaultValue: defaultValue, required: required, description: desc, isEnum: isEnum, location: location)
+    }
+    
+    func propertiesFromSchemaProperties(schemaProperties: [String: DiscoveryJSONSchema], resourceName: String, className: String) -> [Property] {
         var properties: [Property] = []
         for (propertyName, propertyInfo) in schemaProperties {
-            // 1) property type
-            var propertyType = ""
-            // 2) isEnum
-            var isEnum: Bool = false
-            if propertyInfo.enumValues != nil {
-                propertyType = serviceName + resourceName.objcName(shouldCapitalize: true) + propertyName.objcName(shouldCapitalize: true)
-                isEnum = true
-            } else if let typeEnumType = Types.type(forDiscoveryType: propertyInfo.type, format: propertyInfo.format) {
-                if propertyInfo.enumValues == nil {
-                    propertyType = typeEnumType.rawValue
+            let property = generateProperty(forName: propertyName, info: propertyInfo, resourceName: resourceName)
+            if let override = OverrideFileManager.overrideModelClassProperty(name: propertyName, className: className) {
+                if let typeOverride = override.type {
+                    property.type = typeOverride
                 }
-            } else if let type = propertyInfo.type {
-                if type == "array" {
-                    var typeName: String = ""
-                    if let arrayType = propertyInfo.items.xRef { // array of object already declared
-                        typeName = "[\(serviceName + arrayType)]"
-                    } else if propertyInfo.properties != nil || propertyInfo.items.properties != nil { // array of a new type of object
-                        var name = serviceName + resourceName.objcName(shouldCapitalize: true) + propertyName.objcName(shouldCapitalize: true)
-                        if name.characters.last == "s" {
-                            name = String(name.characters.dropLast())
-                        }
-                        typeName = "[\(name)]"
-                    } else if propertyInfo.items.type != nil && propertyInfo.items.type != "object" { // array of primitive
-                        let name = (Types.type(forDiscoveryType: propertyInfo.items.type, format: propertyInfo.items.format)?.rawValue)!
-                        typeName = "[\(name)]"
-                    }
-                    propertyType = typeName
-                } else if type == "object" && propertyInfo.properties != nil {
-                    propertyType = serviceName + resourceName.objcName(shouldCapitalize: true) + propertyName.objcName(shouldCapitalize: true)
-                } else if propertyInfo.additionalProperties != nil && propertyInfo.additionalProperties.xRef != nil {
-                    propertyType = "[String: \(serviceName + propertyInfo.additionalProperties.xRef)]"
+                if let nameOverride = override.name {
+                    property.name = nameOverride
                 }
-            } else if propertyInfo.xRef != nil {
-                propertyType = serviceName + propertyInfo.xRef!
-            }
-            // 3) Transform Type
-            let transformType = Types.transformType(forType: Types(rawValue: propertyType))?.rawValue
-            // 4) Default Value
-            var defaultValue = propertyInfo.defaultValue
-            if defaultValue != nil {
-                if propertyInfo.enumValues != nil {
-                    defaultValue = ".\(propertyInfo.defaultValue!.objcName(shouldCapitalize: true))"
-                } else if propertyType == Types.String.rawValue {
-                    defaultValue = "\"\(propertyInfo.defaultValue!)\""
+                if let defaultValueOverride = override.defaultValue {
+                    property.defaultValue = defaultValueOverride
                 }
             }
-            
-            // 5) Optionality
-            var optionality = OptionalityOnType.ImplicitlyUnwrappedOptional
-            if defaultValue != nil {
-                optionality = OptionalityOnType.NonOptional
-            }
-            // 6) Required
-            let required = (propertyInfo.required != nil) ? true : false
-            // 7) Description
-            let desc = propertyInfo.schemaDescription
-            
-            // 8) location in request (either query or path)
-            let location = propertyInfo.location
-            
-            // 9) put it all together
-            let property = Property(nameFoundInJSONSchema: propertyName, type: propertyType, optionality: optionality, transformType: transformType, defaultValue: defaultValue, required: required, description: desc, isEnum: isEnum, location: location)
             properties.append(property)
         }
         return properties

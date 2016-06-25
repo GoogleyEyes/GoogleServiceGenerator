@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		64BCCCC4A2B063DBEA21A872 /* Pods_GoogleServiceGenerator.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F99A28DEE2E1B1899806428 /* Pods_GoogleServiceGenerator.framework */; };
+		A40D20841D19F51B000E8B9B /* blogger.override.json in Resources */ = {isa = PBXBuildFile; fileRef = A40D20831D19F51B000E8B9B /* blogger.override.json */; };
+		A40D20861D19F554000E8B9B /* OverrideFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40D20851D19F554000E8B9B /* OverrideFile.swift */; };
+		A40D20881D1A10F2000E8B9B /* OverrideFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40D20871D1A10F2000E8B9B /* OverrideFileManager.swift */; };
 		A42E33291BD345330066F807 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A42E33281BD345330066F807 /* AppDelegate.swift */; };
 		A42E332B1BD345340066F807 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A42E332A1BD345340066F807 /* ViewController.swift */; };
 		A42E332D1BD345340066F807 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A42E332C1BD345340066F807 /* Assets.xcassets */; };
@@ -25,7 +29,6 @@
 		A42E335A1BD34ACB0066F807 /* Generator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A45837471B2A08F6005868A9 /* Generator.swift */; };
 		A42E335B1BD34ACB0066F807 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A421759D1B37BA4A009ED7F2 /* Utils.swift */; };
 		A42E335F1BD3528F0066F807 /* GeneratorHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = A42E335E1BD3528F0066F807 /* GeneratorHelpers.m */; };
-		C9F49CC61B94DC07D33DF92C /* Pods_GoogleServiceGenerator.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0F13E0B8CC0C948298062018 /* Pods_GoogleServiceGenerator.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -46,9 +49,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		0F13E0B8CC0C948298062018 /* Pods_GoogleServiceGenerator.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GoogleServiceGenerator.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		62BF37A6F4A37C72BDD20887 /* Pods-GoogleServiceGenerator.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GoogleServiceGenerator.release.xcconfig"; path = "Pods/Target Support Files/Pods-GoogleServiceGenerator/Pods-GoogleServiceGenerator.release.xcconfig"; sourceTree = "<group>"; };
-		74839CC64FBF15682DA00FFE /* Pods-GoogleServiceGenerator.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GoogleServiceGenerator.debug.xcconfig"; path = "Pods/Target Support Files/Pods-GoogleServiceGenerator/Pods-GoogleServiceGenerator.debug.xcconfig"; sourceTree = "<group>"; };
+		4B1814B58D889CC76E1576E5 /* Pods-GoogleServiceGenerator.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GoogleServiceGenerator.release.xcconfig"; path = "Pods/Target Support Files/Pods-GoogleServiceGenerator/Pods-GoogleServiceGenerator.release.xcconfig"; sourceTree = "<group>"; };
+		5F99A28DEE2E1B1899806428 /* Pods_GoogleServiceGenerator.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GoogleServiceGenerator.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A40D20831D19F51B000E8B9B /* blogger.override.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = blogger.override.json; path = Overrides/blogger.override.json; sourceTree = "<group>"; };
+		A40D20851D19F554000E8B9B /* OverrideFile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OverrideFile.swift; sourceTree = "<group>"; };
+		A40D20871D1A10F2000E8B9B /* OverrideFileManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OverrideFileManager.swift; sourceTree = "<group>"; };
 		A40E74B81B9D252C005382CD /* SourceFileGeneratable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SourceFileGeneratable.swift; sourceTree = "<group>"; };
 		A40E74BA1B9D271C005382CD /* ModelEnum.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModelEnum.swift; sourceTree = "<group>"; };
 		A40E74BC1B9D2A38005382CD /* ServiceClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ServiceClass.swift; sourceTree = "<group>"; };
@@ -75,6 +80,7 @@
 		A4C5800E1B9B729100AD2F38 /* SystemTypes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SystemTypes.swift; sourceTree = "<group>"; };
 		A4C580101B9B7BFD00AD2F38 /* ModelClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModelClass.swift; sourceTree = "<group>"; };
 		A4CEB9681B3E3F6400FE78FE /* Property.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Property.swift; sourceTree = "<group>"; };
+		C25BD257EBD2B6C5CF9A0518 /* Pods-GoogleServiceGenerator.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GoogleServiceGenerator.debug.xcconfig"; path = "Pods/Target Support Files/Pods-GoogleServiceGenerator/Pods-GoogleServiceGenerator.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -82,7 +88,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C9F49CC61B94DC07D33DF92C /* Pods_GoogleServiceGenerator.framework in Frameworks */,
+				64BCCCC4A2B063DBEA21A872 /* Pods_GoogleServiceGenerator.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -103,6 +109,33 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		86D2609B6B455B2593295F33 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				C25BD257EBD2B6C5CF9A0518 /* Pods-GoogleServiceGenerator.debug.xcconfig */,
+				4B1814B58D889CC76E1576E5 /* Pods-GoogleServiceGenerator.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		A40D20811D19F4D2000E8B9B /* Overriding */ = {
+			isa = PBXGroup;
+			children = (
+				A40D20821D19F4DF000E8B9B /* Override Files */,
+				A40D20851D19F554000E8B9B /* OverrideFile.swift */,
+				A40D20871D1A10F2000E8B9B /* OverrideFileManager.swift */,
+			);
+			name = Overriding;
+			sourceTree = "<group>";
+		};
+		A40D20821D19F4DF000E8B9B /* Override Files */ = {
+			isa = PBXGroup;
+			children = (
+				A40D20831D19F51B000E8B9B /* blogger.override.json */,
+			);
+			name = "Override Files";
+			sourceTree = "<group>";
+		};
 		A42E331B1BD2E3CC0066F807 /* Transformers */ = {
 			isa = PBXGroup;
 			children = (
@@ -116,6 +149,7 @@
 		A42E33271BD345330066F807 /* GoogleServiceGenerator */ = {
 			isa = PBXGroup;
 			children = (
+				A40D20811D19F4D2000E8B9B /* Overriding */,
 				A4CEB9671B3E3F4100FE78FE /* Model */,
 				A42E331B1BD2E3CC0066F807 /* Transformers */,
 				A42E33281BD345330066F807 /* AppDelegate.swift */,
@@ -153,12 +187,12 @@
 		A45837161B2A06E9005868A9 = {
 			isa = PBXGroup;
 			children = (
-				E63427C5A2EA7A9B64D6A92D /* Frameworks */,
 				A42E33271BD345330066F807 /* GoogleServiceGenerator */,
 				A42E33391BD345350066F807 /* GoogleServiceGeneratorTests */,
 				A42E33441BD345350066F807 /* GoogleServiceGeneratorUITests */,
-				D299C27F7687B70E0B7C6FB4 /* Pods */,
 				A45837201B2A06E9005868A9 /* Products */,
+				86D2609B6B455B2593295F33 /* Pods */,
+				F2FAB032BDBA428F0E253BC8 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -185,19 +219,10 @@
 			path = Model;
 			sourceTree = "<group>";
 		};
-		D299C27F7687B70E0B7C6FB4 /* Pods */ = {
+		F2FAB032BDBA428F0E253BC8 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				74839CC64FBF15682DA00FFE /* Pods-GoogleServiceGenerator.debug.xcconfig */,
-				62BF37A6F4A37C72BDD20887 /* Pods-GoogleServiceGenerator.release.xcconfig */,
-			);
-			name = Pods;
-			sourceTree = "<group>";
-		};
-		E63427C5A2EA7A9B64D6A92D /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				0F13E0B8CC0C948298062018 /* Pods_GoogleServiceGenerator.framework */,
+				5F99A28DEE2E1B1899806428 /* Pods_GoogleServiceGenerator.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -209,12 +234,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = A42E33481BD345350066F807 /* Build configuration list for PBXNativeTarget "GoogleServiceGenerator" */;
 			buildPhases = (
-				72E69EB60CAB56A2C723190F /* Check Pods Manifest.lock */,
+				471733E448C0517DAA8906CA /* 📦 Check Pods Manifest.lock */,
 				A42E33221BD345330066F807 /* Sources */,
 				A42E33231BD345330066F807 /* Frameworks */,
 				A42E33241BD345330066F807 /* Resources */,
-				31140C7695D45B91A09D673F /* Embed Pods Frameworks */,
-				235C2EF6068910F2576356C7 /* Copy Pods Resources */,
+				8F0BBDAE893F5DFE77C40786 /* 📦 Embed Pods Frameworks */,
+				F9C330CAECF41D788669EA84 /* 📦 Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -309,6 +334,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A40D20841D19F51B000E8B9B /* blogger.override.json in Resources */,
 				A42E332D1BD345340066F807 /* Assets.xcassets in Resources */,
 				A42E33301BD345340066F807 /* Main.storyboard in Resources */,
 			);
@@ -331,29 +357,29 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		235C2EF6068910F2576356C7 /* Copy Pods Resources */ = {
+		471733E448C0517DAA8906CA /* 📦 Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Copy Pods Resources";
+			name = "📦 Check Pods Manifest.lock";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-GoogleServiceGenerator/Pods-GoogleServiceGenerator-resources.sh\"\n";
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
-		31140C7695D45B91A09D673F /* Embed Pods Frameworks */ = {
+		8F0BBDAE893F5DFE77C40786 /* 📦 Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Embed Pods Frameworks";
+			name = "📦 Embed Pods Frameworks";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -361,19 +387,19 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-GoogleServiceGenerator/Pods-GoogleServiceGenerator-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		72E69EB60CAB56A2C723190F /* Check Pods Manifest.lock */ = {
+		F9C330CAECF41D788669EA84 /* 📦 Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Check Pods Manifest.lock";
+			name = "📦 Copy Pods Resources";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-GoogleServiceGenerator/Pods-GoogleServiceGenerator-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -392,11 +418,13 @@
 				A42E33581BD34ACB0066F807 /* ModelEnum.swift in Sources */,
 				A42E33291BD345330066F807 /* AppDelegate.swift in Sources */,
 				A42E33531BD34ACB0066F807 /* SchemaToServiceClassTransformer.swift in Sources */,
+				A40D20861D19F554000E8B9B /* OverrideFile.swift in Sources */,
 				A42E33521BD34ACB0066F807 /* SchemaToModelEnumTransformer.swift in Sources */,
 				A42E335B1BD34ACB0066F807 /* Utils.swift in Sources */,
 				A42E335A1BD34ACB0066F807 /* Generator.swift in Sources */,
 				A42E33511BD34ACB0066F807 /* SchemaToModelClassTransformer.swift in Sources */,
 				A42E33571BD34ACB0066F807 /* SourceFileGeneratable.swift in Sources */,
+				A40D20881D1A10F2000E8B9B /* OverrideFileManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -446,7 +474,7 @@
 /* Begin XCBuildConfiguration section */
 		A42E33491BD345350066F807 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 74839CC64FBF15682DA00FFE /* Pods-GoogleServiceGenerator.debug.xcconfig */;
+			baseConfigurationReference = C25BD257EBD2B6C5CF9A0518 /* Pods-GoogleServiceGenerator.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -463,7 +491,7 @@
 		};
 		A42E334A1BD345350066F807 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 62BF37A6F4A37C72BDD20887 /* Pods-GoogleServiceGenerator.release.xcconfig */;
+			baseConfigurationReference = 4B1814B58D889CC76E1576E5 /* Pods-GoogleServiceGenerator.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
