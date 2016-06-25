@@ -22,6 +22,8 @@ class SchemaToModelEnumTransformer {
                 enumType = typeEnumType.rawValue
             }
         }
+        // 1a) Type Description
+        let typeDescription = propertyInfo.schemaDescription != nil ? propertyInfo.schemaDescription : ""
         // 2) Cases
         var enumCases = propertyInfo.enumValues
         if enumType == "String" {
@@ -31,9 +33,15 @@ class SchemaToModelEnumTransformer {
         }
         // 3) CaseNames
         let caseNames = propertyInfo.enumValues.map { (rawValue) -> String in
+            if let value = OverrideFileManager.overrideAPIEnumCaseNames(resourceName: resourceName, propertyName: propertyName, input: rawValue) {
+                return value
+            }
+            
             return rawValue.objcName(shouldCapitalize: true)
         }
+        // 3a) Case Descriptions
+        let caseDescriptions = propertyInfo.enumDescriptions
         // 4) put it all together
-        return ModelEnum(name: enumName, type: enumType, cases: enumCases, caseNames: caseNames)
+        return ModelEnum(name: enumName, type: enumType, typeDescription: typeDescription, cases: enumCases, caseNames: caseNames, caseDescriptions: caseDescriptions)
     }
 }

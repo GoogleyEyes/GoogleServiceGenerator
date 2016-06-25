@@ -30,8 +30,9 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     @IBOutlet weak var directoryTextField: NSTextField!
     
     func loadData() {
-        Discovery.sharedInstance.preferred = true
-        Discovery.sharedInstance.listAPIs { (list, error) -> () in
+        let discovery = Discovery()
+        discovery.preferred = true
+        discovery.listAPIs { (list, error) -> () in
             if list != nil {
                 self.apiList = list!
                 print(list)

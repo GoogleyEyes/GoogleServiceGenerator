@@ -14,21 +14,25 @@ import Cocoa
 class ModelClass: SourceFileGeneratable, CustomStringConvertible {
     var superclass: String
     var properties: [Property]
+    var classDescription: String
     
-    init(className: String, superclass: String, properties: [Property]) {
+    init(className: String, superclass: String, properties: [Property], description: String) {
         self.superclass = superclass
         self.properties = properties
+        self.classDescription = description
         
         super.init()
         self.name = className
     }
     
     var description: String {
-        return "public class \(name): \(superclass)"
+        return classDescription.documentationString() + "\npublic class \(name): \(superclass)"
     }
     override func generateSourceFileString() -> String {
         // 1) class declaration (with "{")
-        var string = "public class \(name): \(superclass) {"
+        var string = classDescription.documentationString()
+        string.addNewLine()
+        string += "public class \(name): \(superclass) {"
         string.addNewLine(); string.addTab()
         // 2) property declarations
         for property in properties {
