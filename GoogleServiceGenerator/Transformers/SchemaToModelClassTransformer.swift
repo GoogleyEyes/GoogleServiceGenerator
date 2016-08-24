@@ -28,8 +28,16 @@ class SchemaToModelClassTransformer {
         } else {
             superclass = "ObjectType"
         }
+        if let overrideSuperclass = OverrideFileManager.overrideModelClass(className: className)?.type {
+            superclass = overrideSuperclass
+        }
         // 4) description
-        let description = "The \(schemaName) model type for use with the \(serviceName) API"
+        let description: String
+        if let desc = schema.schemaDescription {
+            description = desc
+        } else {
+            description = "The \(schemaName) model type for use with the \(serviceName) API"
+        }
         // 5) put it all together
         return ModelClass(className: className, superclass: superclass, properties: properties, description: description)
     }
@@ -38,26 +46,36 @@ class SchemaToModelClassTransformer {
         // 1) class name
         let className = serviceName + schemaName
         // 2a) list type
-        let listType: String
+        var listType: String
         if schema.properties?["kind"] != nil {
             listType = "GoogleObjectList"
         } else {
             listType = "ListType"
         }
+        if let overrideListType = OverrideFileManager.overrideModelClass(className: className)?.type {
+            listType = overrideListType
+        }
         // 2b) item type
         let itemType = serviceName + schema.properties["items"]!.items.xRef!
         // 3) properties
         var properties = propertiesFromSchemaProperties(schema.properties, resourceName: "", className: className)
-        let itemProperties = weedOutItemsProperties(properties)
-        for property in itemProperties {
-            if property.type != "[Type]" {
-                properties.removeAtIndex(properties.indexOf(property)!)
-            }
-        }
+//        let itemProperties = weedOutItemsProperties(properties)
+//        for property in itemProperties {
+//            if property.type != "[Type]" {
+//                properties.removeAtIndex(properties.indexOf(property)!)
+//            }
+//        }
         // 4) items description
         let itemsDescription = schema.properties["items"]!.schemaDescription
-        // 4) put it all together
-        return ModelListClass(className: className, properties: properties, itemType: itemType, itemsPropertyDescription: itemsDescription, listType: listType)
+        // 5) description
+        let description: String
+        if let desc = schema.schemaDescription {
+            description = desc
+        } else {
+            description = "The \(schemaName) model type for use with the \(serviceName) API"
+        }
+        // 6) put it all together
+        return ModelListClass(className: className, properties: properties, itemType: itemType, itemsPropertyDescription: itemsDescription, listType: listType, classDescription: description)
     }
     
     private func weedOutItemsProperties(array: [Property]) -> [Property] {

@@ -23,6 +23,7 @@ enum Types: String {
     case UInt64 = "UInt64"
     case NSDate = "NSDate"
     case Int64 = "Int64"
+    case NSData = "NSData"
     
     // ObjectMapper
     case Mappable = "Mappable"
@@ -31,6 +32,7 @@ enum Types: String {
     case DateTransform = "DateTransform"
     case ISO8601DateTransrom = "ISO8601DateTransform"
     case RFC3339Transform = "RFC3339Transform"
+    case Base64Transform = "Base64Transform"
 }
 
 extension Types {
@@ -66,7 +68,7 @@ extension Types {
                     if let strFormat = format {
                         switch strFormat {
                             case "byte":
-                                selfValue = Types.NSURL.rawValue
+                                selfValue = Types.NSData.rawValue
                             case "date":
                                 selfValue = Types.NSDate.rawValue
                             case "date-time":
@@ -98,6 +100,8 @@ extension Types {
                 returnType = .URLTransform
             case .NSDate:
                 returnType = .RFC3339Transform
+            case .NSData:
+                returnType = .Base64Transform
             default:
                 returnType = nil
             }
