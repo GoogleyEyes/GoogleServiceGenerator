@@ -70,7 +70,11 @@ class ScopesEnum: SourceFileGeneratable, CustomStringConvertible {
                     endComponents.insert(serviceName, atIndex: 0)
                 }
             }
-            return String.objcName(components: endComponents, shouldCapitalize: true)
+            var caseName = String.objcName(components: endComponents, shouldCapitalize: true)
+            if let overrideCase = OverrideFileManager.overrideScopesEnumCaseName(currentName: caseName) {
+                caseName = overrideCase
+            }
+            return caseName
         })
         self.values = values.map({ (raw) -> String in
             return "\"\(raw)\""

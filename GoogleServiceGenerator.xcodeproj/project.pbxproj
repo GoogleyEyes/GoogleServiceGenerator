@@ -29,6 +29,7 @@
 		A42E335A1BD34ACB0066F807 /* Generator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A45837471B2A08F6005868A9 /* Generator.swift */; };
 		A42E335B1BD34ACB0066F807 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A421759D1B37BA4A009ED7F2 /* Utils.swift */; };
 		A42E335F1BD3528F0066F807 /* GeneratorHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = A42E335E1BD3528F0066F807 /* GeneratorHelpers.m */; };
+		A4793C011D347A6A005D8FCF /* youtube.override.json in Resources */ = {isa = PBXBuildFile; fileRef = A4793C001D347A6A005D8FCF /* youtube.override.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -77,6 +78,7 @@
 		A42E335D1BD3528F0066F807 /* GeneratorHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GeneratorHelpers.h; sourceTree = "<group>"; };
 		A42E335E1BD3528F0066F807 /* GeneratorHelpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratorHelpers.m; sourceTree = "<group>"; };
 		A45837471B2A08F6005868A9 /* Generator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Generator.swift; sourceTree = "<group>"; };
+		A4793C001D347A6A005D8FCF /* youtube.override.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = youtube.override.json; path = Overrides/youtube.override.json; sourceTree = "<group>"; };
 		A4C5800E1B9B729100AD2F38 /* SystemTypes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SystemTypes.swift; sourceTree = "<group>"; };
 		A4C580101B9B7BFD00AD2F38 /* ModelClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModelClass.swift; sourceTree = "<group>"; };
 		A4CEB9681B3E3F6400FE78FE /* Property.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Property.swift; sourceTree = "<group>"; };
@@ -131,6 +133,7 @@
 		A40D20821D19F4DF000E8B9B /* Override Files */ = {
 			isa = PBXGroup;
 			children = (
+				A4793C001D347A6A005D8FCF /* youtube.override.json */,
 				A40D20831D19F51B000E8B9B /* blogger.override.json */,
 			);
 			name = "Override Files";
@@ -334,6 +337,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A4793C011D347A6A005D8FCF /* youtube.override.json in Resources */,
 				A40D20841D19F51B000E8B9B /* blogger.override.json in Resources */,
 				A42E332D1BD345340066F807 /* Assets.xcassets in Resources */,
 				A42E33301BD345340066F807 /* Main.storyboard in Resources */,

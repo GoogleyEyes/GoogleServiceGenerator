@@ -9,7 +9,7 @@
 import Cocoa
 import ObjectMapper
 
-var APIOverrideFile: OverrideFile!
+var APIOverrideFile: OverrideFile?
 
 func loadOverrideFile(serviceName: String) {
     if let path = NSBundle.mainBundle().pathForResource("\(serviceName).override", ofType: "json") {
@@ -60,6 +60,7 @@ class OverrideEnum: Mappable {
 class OverrideServiceClass: Mappable {
     var params: [String: OverrideProperty]!
     var methods: [String: OverrideServiceClassMethod]!
+    var scopesEnum: [String: String]?
     
     required init?(_ map: Map) {
         
@@ -68,6 +69,7 @@ class OverrideServiceClass: Mappable {
     func mapping(map: Map) {
         params <- map["params"]
         methods <- map["methods"]
+        scopesEnum <- map["scopesEnum"]
     }
 }
 
@@ -126,6 +128,7 @@ class OverrideServiceClassMethodParamNames: Mappable {
 
 class OverrideModelClass: Mappable {
     var properties: [String: OverrideProperty]?
+    var type: String?
     
     required init?(_ map: Map) {
         
@@ -133,5 +136,6 @@ class OverrideModelClass: Mappable {
     
     func mapping(map: Map) {
         properties <- map["properties"]
+        type <- map["type"]
     }
 }

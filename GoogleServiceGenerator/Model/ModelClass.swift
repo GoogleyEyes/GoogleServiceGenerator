@@ -79,29 +79,33 @@ class ModelListClass: SourceFileGeneratable, CustomStringConvertible{
     var properties: [Property]
     var itemType: String
     var listType: String
+    var classDescription: String
     
-    init(className: String, properties: [Property], itemType: String, itemsPropertyDescription: String, listType: String) {
-        self.properties = [Property(nameFoundInJSONSchema: "items", type: "[Type]", optionality: .ImplicitlyUnwrappedOptional, description: itemsPropertyDescription)]
-        self.properties.appendContentsOf(properties)
+    init(className: String, properties: [Property], itemType: String, itemsPropertyDescription: String?, listType: String, classDescription: String) {
+//        self.properties = [Property(nameFoundInJSONSchema: "items", type: "[Type]", optionality: .ImplicitlyUnwrappedOptional, description: itemsPropertyDescription)]
+        self.properties = properties
         self.itemType = itemType
         self.listType = listType
+        self.classDescription = classDescription
         
         super.init()
         self.name = className
     }
     
     var description: String {
-        return "public class \(name): \(listType)"
+        return classDescription.documentationString() + "\npublic class \(name): \(listType)"
     }
     
     override func generateSourceFileString() -> String {
         // 1) class declaration (with "{")
-        var string = "public class \(name): \(listType) {"
+        var string = classDescription.documentationString()
+        string.addNewLine()
+        string += "public class \(name): \(listType) {"
         string.addNewLine(); string.addTab()
         
         // 2) property declarations
-        string += "public typealias Type = \(itemType)"
-        string.addNewLine(); string.addTab()
+//        string += "public typealias Type = \(itemType)"
+//        string.addNewLine(); string.addTab()
         for property in properties {
             string += "\(property)"
             string.addNewLine(); string.addTab()
@@ -140,7 +144,7 @@ class ModelListClass: SourceFileGeneratable, CustomStringConvertible{
         string.addNewLine(); string.addTab()
         
         // 5) arrayLiteral init()
-        string += "public required init(arrayLiteral elements: Type...) {"
+        string += "public required init(arrayLiteral elements: \(itemType)...) {"
         string.addNewLine(); string.addTab(); string.addTab()
         string += "items = elements"
         string.addNewLine(); string.addTab()
@@ -148,11 +152,11 @@ class ModelListClass: SourceFileGeneratable, CustomStringConvertible{
         string.addNewLine(); string.addNewLine(); string.addTab()
         
         // 6) Generate (forin)
-        string += "public typealias Generator = IndexingGenerator<[Type]>"
+        string += "public typealias Generator = IndexingGenerator<[\(itemType)]>"
         string.addNewLine(); string.addNewLine(); string.addTab()
         string += "public func generate() -> Generator {"
         string.addNewLine(); string.addTab(); string.addTab()
-        string += "let objects = items as [Type]"
+        string += "let objects = items as [\(itemType)]"
         string.addNewLine(); string.addTab(); string.addTab()
         string += "return objects.generate()"
         string.addNewLine(); string.addTab()
@@ -160,7 +164,7 @@ class ModelListClass: SourceFileGeneratable, CustomStringConvertible{
         string.addNewLine(); string.addNewLine(); string.addTab()
         
         // 7) subscript
-        string += "public subscript(position: Int) -> Type {"
+        string += "public subscript(position: Int) -> \(itemType) {"
         string.addNewLine(); string.addTab(); string.addTab()
         string += "return items[position]"
         string.addNewLine(); string.addTab()

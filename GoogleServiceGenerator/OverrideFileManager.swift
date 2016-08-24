@@ -10,7 +10,7 @@ import Cocoa
 
 class OverrideFileManager {
     class func overrideAPIBaseName(methodId: String) -> String? {
-        if let overrideName = APIOverrideFile.serviceClass.methods[apiMethodIdentifierWithoutServiceName(methodId)]?.baseName {
+        if let overrideName = APIOverrideFile?.serviceClass.methods[apiMethodIdentifierWithoutServiceName(methodId)]?.baseName {
             return overrideName
         } else {
             return nil
@@ -18,7 +18,7 @@ class OverrideFileManager {
     }
     
     class func overrideAPIMethodFullName(methodId: String) -> String? {
-        if let overrideName = APIOverrideFile.serviceClass.methods[apiMethodIdentifierWithoutServiceName(methodId)]?.fullMethodName {
+        if let overrideName = APIOverrideFile?.serviceClass.methods[apiMethodIdentifierWithoutServiceName(methodId)]?.fullMethodName {
             return overrideName
         } else {
             return nil
@@ -26,7 +26,7 @@ class OverrideFileManager {
     }
     
     class func overrideAPIMethodParameterNames(methodId: String) -> OverrideServiceClassMethodParamNames? {
-        if let overrideNames = APIOverrideFile.serviceClass.methods[apiMethodIdentifierWithoutServiceName(methodId)]?.paramNames {
+        if let overrideNames = APIOverrideFile?.serviceClass.methods[apiMethodIdentifierWithoutServiceName(methodId)]?.paramNames {
             return overrideNames
         } else {
             return nil
@@ -40,24 +40,28 @@ class OverrideFileManager {
         } else {
             id = [resourceName, propertyName].joinWithSeparator(".")
         }
-        return APIOverrideFile.enums[id]?.overrideNameForInput(input)
+        return APIOverrideFile?.enums[id]?.overrideNameForInput(input)
     }
     
     class func overrideAPIGlobalQueryParam(propertyName: String) -> OverrideProperty? {
-        return APIOverrideFile.serviceClass.params[propertyName]
+        return APIOverrideFile?.serviceClass.params[propertyName]
     }
     
     class func overrideAPIMethodQueryParam(methodId: String, propertyName: String) -> OverrideProperty? {
         let methodString = apiMethodIdentifierWithoutServiceName(methodId)
-        return APIOverrideFile.serviceClass.methods[methodString]?.queryParams?[propertyName]
+        return APIOverrideFile?.serviceClass.methods[methodString]?.queryParams?[propertyName]
     }
     
     class func overrideModelClass(className className: String) -> OverrideModelClass? {
-        return APIOverrideFile.modelClasses[className]
+        return APIOverrideFile?.modelClasses?[className]
     }
     
     class func overrideModelClassProperty(name name: String, className: String) -> OverrideProperty? {
         return overrideModelClass(className: className)?.properties?[name]
+    }
+    
+    class func overrideScopesEnumCaseName(currentName name: String) -> String? {
+        return APIOverrideFile?.serviceClass.scopesEnum?[name]
     }
     
     private class func apiMethodIdentifierWithoutServiceName(identifier: String) -> String {
