@@ -17,9 +17,9 @@ class SchemaToServiceClassTransformer {
         // 1) Class Name
         let className = discoveryDoc.name.objcName(shouldCapitalize: true)
         // 2) API Name
-        let apiName = discoveryDoc.name
+        let apiName = discoveryDoc.name!
         // 3) API Version
-        let apiVersion = discoveryDoc.version
+        let apiVersion = discoveryDoc.version!
         // 4) Global Query Parameters
         let listedParams = globalQueryParams("", schemaProperties: discoveryDoc.parameters)
         var globalParams: [Property] = []
@@ -31,7 +31,7 @@ class SchemaToServiceClassTransformer {
         }
         
         // 4a) description
-        let description = discoveryDoc.APIDescription
+        let description = discoveryDoc.APIDescription!
         
         // 5) put it all together
         let serviceClass = ServiceClass(className: className, apiName: apiName, apiVersion: apiVersion, globalQueryParams: globalParams, classDescription: description)
@@ -40,7 +40,7 @@ class SchemaToServiceClassTransformer {
         var methods: [APIMethod] = []
         for (resourceName, resourceInfo) in discoveryDoc.resources {
             let resourceMethods = apiMethods(fromMethodsSchema: resourceInfo.methods, resourceName: resourceName, serviceClass: serviceClass)
-            methods.appendContentsOf(resourceMethods)
+            methods.append(contentsOf: resourceMethods)
         }
         serviceClass.apiMethods = methods
         
@@ -69,13 +69,13 @@ class SchemaToServiceClassTransformer {
             // 6) Request type and var name
             let requestType: String? = methodInfo.requestRef != nil ? serviceName + methodInfo.requestRef.objcName(shouldCapitalize: true) : nil
             let requestTypeVarname: String? = methodInfo.requestRef != nil ? methodInfo.requestRef.objcName(shouldCapitalize: false).makeCamelCaseLowerCase(): nil
-            let requestMethod = Alamofire.Method(rawValue: methodInfo.httpMethod)!
+            let requestMethod = Alamofire.HTTPMethod(rawValue: methodInfo.httpMethod)!
             // 7) supports media uploads
             let supportsMediaUploads = methodInfo.supportsMediaUpload != nil ? methodInfo.supportsMediaUpload : false
             // 8) description
             let description = methodInfo.methodDescription
             // 9) put it all together
-            let method = APIMethod(name: name, requestMethod: requestMethod, parameters: parameters, jsonPostBodyType: requestType, jsonPostBodyVarName: requestTypeVarname, supportsMediaUpload: supportsMediaUploads, returnType: returnType, returnTypeVariableName: returnTypeVarname, endpoint: endpoint, serviceClass: serviceClass, description: description, methodId: methodInfo.identifier)
+            let method = APIMethod(name: name, requestMethod: requestMethod, parameters: parameters, jsonPostBodyType: requestType, jsonPostBodyVarName: requestTypeVarname, supportsMediaUpload: supportsMediaUploads!, returnType: returnType, returnTypeVariableName: returnTypeVarname, endpoint: endpoint!, serviceClass: serviceClass, description: description!, methodId: methodInfo.identifier)
             methods.append(method)
         }
         return methods
@@ -93,7 +93,7 @@ class SchemaToServiceClassTransformer {
         return ScopesEnum(serviceName: self.serviceName, values: values, scopeDescriptions: descriptions)
     }
     
-    func queryParamsForMethodId(id: String, resourceName: String, schemaProperties: [String: DiscoveryJSONSchema]) -> [Property] {
+    func queryParamsForMethodId(_ id: String, resourceName: String, schemaProperties: [String: DiscoveryJSONSchema]) -> [Property] {
         var properties: [Property] = []
         for (propertyName, propertyInfo) in schemaProperties {
             let property = SchemaToModelClassTransformer().generateProperty(forName: propertyName, info: propertyInfo, resourceName: resourceName)
@@ -116,7 +116,7 @@ class SchemaToServiceClassTransformer {
         return properties
     }
     
-    func globalQueryParams(resourceName: String, schemaProperties: [String: DiscoveryJSONSchema]) -> [Property] {
+    func globalQueryParams(_ resourceName: String, schemaProperties: [String: DiscoveryJSONSchema]) -> [Property] {
         var properties: [Property] = []
         for (propertyName, propertyInfo) in schemaProperties {
             let property = SchemaToModelClassTransformer().generateProperty(forName: propertyName, info: propertyInfo, resourceName: resourceName)

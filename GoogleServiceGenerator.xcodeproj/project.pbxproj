@@ -11,6 +11,10 @@
 		A40D20841D19F51B000E8B9B /* blogger.override.json in Resources */ = {isa = PBXBuildFile; fileRef = A40D20831D19F51B000E8B9B /* blogger.override.json */; };
 		A40D20861D19F554000E8B9B /* OverrideFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40D20851D19F554000E8B9B /* OverrideFile.swift */; };
 		A40D20881D1A10F2000E8B9B /* OverrideFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40D20871D1A10F2000E8B9B /* OverrideFileManager.swift */; };
+		A41CD2C51D84C4C200C46F74 /* ModelClass.stencil in Resources */ = {isa = PBXBuildFile; fileRef = A41CD2C41D84C4C200C46F74 /* ModelClass.stencil */; };
+		A41CD2C91D84F90A00C46F74 /* ModelListClass.stencil in Resources */ = {isa = PBXBuildFile; fileRef = A41CD2C61D84F90A00C46F74 /* ModelListClass.stencil */; };
+		A41CD2CA1D84F90A00C46F74 /* ServiceClass.stencil in Resources */ = {isa = PBXBuildFile; fileRef = A41CD2C71D84F90A00C46F74 /* ServiceClass.stencil */; };
+		A41CD2CB1D84F90A00C46F74 /* ServiceClassMethod.stencil in Resources */ = {isa = PBXBuildFile; fileRef = A41CD2C81D84F90A00C46F74 /* ServiceClassMethod.stencil */; };
 		A42E33291BD345330066F807 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A42E33281BD345330066F807 /* AppDelegate.swift */; };
 		A42E332B1BD345340066F807 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A42E332A1BD345340066F807 /* ViewController.swift */; };
 		A42E332D1BD345340066F807 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A42E332C1BD345340066F807 /* Assets.xcassets */; };
@@ -58,6 +62,10 @@
 		A40E74B81B9D252C005382CD /* SourceFileGeneratable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SourceFileGeneratable.swift; sourceTree = "<group>"; };
 		A40E74BA1B9D271C005382CD /* ModelEnum.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModelEnum.swift; sourceTree = "<group>"; };
 		A40E74BC1B9D2A38005382CD /* ServiceClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ServiceClass.swift; sourceTree = "<group>"; };
+		A41CD2C41D84C4C200C46F74 /* ModelClass.stencil */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ModelClass.stencil; sourceTree = "<group>"; };
+		A41CD2C61D84F90A00C46F74 /* ModelListClass.stencil */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ModelListClass.stencil; sourceTree = "<group>"; };
+		A41CD2C71D84F90A00C46F74 /* ServiceClass.stencil */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ServiceClass.stencil; sourceTree = "<group>"; };
+		A41CD2C81D84F90A00C46F74 /* ServiceClassMethod.stencil */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ServiceClassMethod.stencil; sourceTree = "<group>"; };
 		A421759D1B37BA4A009ED7F2 /* Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		A42E331C1BD2E4010066F807 /* SchemaToModelClassTransformer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SchemaToModelClassTransformer.swift; sourceTree = "<group>"; };
 		A42E331E1BD31C450066F807 /* SchemaToModelEnumTransformer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SchemaToModelEnumTransformer.swift; sourceTree = "<group>"; };
@@ -139,6 +147,17 @@
 			name = "Override Files";
 			sourceTree = "<group>";
 		};
+		A41CD2C31D84C4C200C46F74 /* Templates */ = {
+			isa = PBXGroup;
+			children = (
+				A41CD2C61D84F90A00C46F74 /* ModelListClass.stencil */,
+				A41CD2C71D84F90A00C46F74 /* ServiceClass.stencil */,
+				A41CD2C81D84F90A00C46F74 /* ServiceClassMethod.stencil */,
+				A41CD2C41D84C4C200C46F74 /* ModelClass.stencil */,
+			);
+			path = Templates;
+			sourceTree = "<group>";
+		};
 		A42E331B1BD2E3CC0066F807 /* Transformers */ = {
 			isa = PBXGroup;
 			children = (
@@ -212,6 +231,7 @@
 		A4CEB9671B3E3F4100FE78FE /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				A41CD2C31D84C4C200C46F74 /* Templates */,
 				A4C580101B9B7BFD00AD2F38 /* ModelClass.swift */,
 				A40E74BA1B9D271C005382CD /* ModelEnum.swift */,
 				A4CEB9681B3E3F6400FE78FE /* Property.swift */,
@@ -237,12 +257,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = A42E33481BD345350066F807 /* Build configuration list for PBXNativeTarget "GoogleServiceGenerator" */;
 			buildPhases = (
-				471733E448C0517DAA8906CA /* 📦 Check Pods Manifest.lock */,
+				471733E448C0517DAA8906CA /* [CP] Check Pods Manifest.lock */,
 				A42E33221BD345330066F807 /* Sources */,
 				A42E33231BD345330066F807 /* Frameworks */,
 				A42E33241BD345330066F807 /* Resources */,
-				8F0BBDAE893F5DFE77C40786 /* 📦 Embed Pods Frameworks */,
-				F9C330CAECF41D788669EA84 /* 📦 Copy Pods Resources */,
+				8F0BBDAE893F5DFE77C40786 /* [CP] Embed Pods Frameworks */,
+				F9C330CAECF41D788669EA84 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -296,18 +316,21 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0700;
-				LastUpgradeCheck = 0700;
+				LastUpgradeCheck = 0800;
 				ORGANIZATIONNAME = "Matthew Wyskiel";
 				TargetAttributes = {
 					A42E33251BD345330066F807 = {
 						CreatedOnToolsVersion = 7.0.1;
+						LastSwiftMigration = 0800;
 					};
 					A42E33351BD345350066F807 = {
 						CreatedOnToolsVersion = 7.0.1;
+						LastSwiftMigration = 0800;
 						TestTargetID = A42E33251BD345330066F807;
 					};
 					A42E33401BD345350066F807 = {
 						CreatedOnToolsVersion = 7.0.1;
+						LastSwiftMigration = 0800;
 						TestTargetID = A42E33251BD345330066F807;
 					};
 				};
@@ -337,10 +360,14 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A41CD2C51D84C4C200C46F74 /* ModelClass.stencil in Resources */,
 				A4793C011D347A6A005D8FCF /* youtube.override.json in Resources */,
+				A41CD2CB1D84F90A00C46F74 /* ServiceClassMethod.stencil in Resources */,
 				A40D20841D19F51B000E8B9B /* blogger.override.json in Resources */,
 				A42E332D1BD345340066F807 /* Assets.xcassets in Resources */,
 				A42E33301BD345340066F807 /* Main.storyboard in Resources */,
+				A41CD2CA1D84F90A00C46F74 /* ServiceClass.stencil in Resources */,
+				A41CD2C91D84F90A00C46F74 /* ModelListClass.stencil in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -361,14 +388,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		471733E448C0517DAA8906CA /* 📦 Check Pods Manifest.lock */ = {
+		471733E448C0517DAA8906CA /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "📦 Check Pods Manifest.lock";
+			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -376,14 +403,14 @@
 			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
-		8F0BBDAE893F5DFE77C40786 /* 📦 Embed Pods Frameworks */ = {
+		8F0BBDAE893F5DFE77C40786 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "📦 Embed Pods Frameworks";
+			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -391,14 +418,14 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-GoogleServiceGenerator/Pods-GoogleServiceGenerator-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		F9C330CAECF41D788669EA84 /* 📦 Copy Pods Resources */ = {
+		F9C330CAECF41D788669EA84 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "📦 Copy Pods Resources";
+			name = "[CP] Copy Pods Resources";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -480,6 +507,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = C25BD257EBD2B6C5CF9A0518 /* Pods-GoogleServiceGenerator.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "-";
@@ -490,6 +518,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "GoogleServiceGenerator/GoogleServiceGenerator-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -497,6 +526,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B1814B58D889CC76E1576E5 /* Pods-GoogleServiceGenerator.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "-";
@@ -506,6 +536,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.matthewwyskiel.GoogleServiceGenerator;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "GoogleServiceGenerator/GoogleServiceGenerator-Bridging-Header.h";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
@@ -518,6 +549,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.matthewwyskiel.GoogleServiceGeneratorTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/GoogleServiceGenerator.app/Contents/MacOS/GoogleServiceGenerator";
 			};
 			name = Debug;
@@ -531,6 +563,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.matthewwyskiel.GoogleServiceGeneratorTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/GoogleServiceGenerator.app/Contents/MacOS/GoogleServiceGenerator";
 			};
 			name = Release;
@@ -543,6 +576,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.matthewwyskiel.GoogleServiceGeneratorUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 				TEST_TARGET_NAME = GoogleServiceGenerator;
 				USES_XCTRUNNER = YES;
 			};
@@ -556,6 +590,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.matthewwyskiel.GoogleServiceGeneratorUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 				TEST_TARGET_NAME = GoogleServiceGenerator;
 				USES_XCTRUNNER = YES;
 			};
@@ -574,8 +609,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
@@ -597,7 +634,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -618,8 +655,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
@@ -634,9 +673,10 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 			};
 			name = Release;
 		};

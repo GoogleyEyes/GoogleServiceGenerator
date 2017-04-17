@@ -9,15 +9,15 @@
 import Cocoa
 
 extension String {
-    func objcName(shouldCapitalize shouldCapitalize: Bool, allowLeadingDigits: Bool = false) -> String {
+    func objcName(shouldCapitalize: Bool, allowLeadingDigits: Bool = false) -> String {
         var vetted = GeneratorHelpers.objcName(self, shouldCapitalize: shouldCapitalize, allowLeadingDigits: allowLeadingDigits)
         if vetted == "default" {
             vetted = "defaultValue"
         }
-        return vetted
+        return vetted!
     }
     
-    static func objcName(components components: [String], shouldCapitalize: Bool, allowLeadingDigits: Bool = false) -> String {
+    static func objcName(components: [String], shouldCapitalize: Bool, allowLeadingDigits: Bool = false) -> String {
         var finalString: String = ""
         for component in components {
             if component == components.first {
@@ -36,13 +36,11 @@ extension String {
         return "\n"
     }
     
-    mutating func addNewLine() -> String {
+    mutating func addNewLine() {
         self += String.newLine
-        return self
     }
-    mutating func addTab() -> String {
+    mutating func addTab() {
         self += String.tab
-        return self
     }
     
     func makeCamelCaseLowerCase() -> String {
@@ -51,7 +49,7 @@ extension String {
         for char in strInitial.characters {
             if char == strInitial.characters.first {
                 let charStr = String(char)
-                let lowercase = charStr.lowercaseString
+                let lowercase = charStr.lowercased()
                 let finalChar = lowercase.characters.first
                 characters.append(finalChar!)
             } else {
@@ -63,9 +61,9 @@ extension String {
     
     func documentationString() -> String {
         var final = ""
-        if self.componentsSeparatedByString("\n").count != 1 {
+        if self.components(separatedBy: "\n").count != 1 {
             final += "/**"
-            for component in self.componentsSeparatedByString("\n") {
+            for component in self.components(separatedBy: "\n") {
                 final.addNewLine(); final.addTab()
                 final += component
             }

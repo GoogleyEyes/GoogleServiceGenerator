@@ -9,54 +9,54 @@
 import Cocoa
 
 class OverrideFileManager {
-    class func overrideAPIBaseName(methodId: String) -> String? {
-        if let overrideName = APIOverrideFile?.serviceClass.methods[apiMethodIdentifierWithoutServiceName(methodId)]?.baseName {
+    class func overrideAPIBaseName(_ methodId: String) -> String? {
+        if let overrideName = APIOverrideFile?.serviceClass?.methods?[apiMethodIdentifierWithoutServiceName(methodId)]?.baseName {
             return overrideName
         } else {
             return nil
         }
     }
     
-    class func overrideAPIMethodFullName(methodId: String) -> String? {
-        if let overrideName = APIOverrideFile?.serviceClass.methods[apiMethodIdentifierWithoutServiceName(methodId)]?.fullMethodName {
+    class func overrideAPIMethodFullName(_ methodId: String) -> String? {
+        if let overrideName = APIOverrideFile?.serviceClass?.methods?[apiMethodIdentifierWithoutServiceName(methodId)]?.fullMethodName {
             return overrideName
         } else {
             return nil
         }
     }
     
-    class func overrideAPIMethodParameterNames(methodId: String) -> OverrideServiceClassMethodParamNames? {
-        if let overrideNames = APIOverrideFile?.serviceClass.methods[apiMethodIdentifierWithoutServiceName(methodId)]?.paramNames {
+    class func overrideAPIMethodParameterNames(_ methodId: String) -> OverrideServiceClassMethodParamNames? {
+        if let overrideNames = APIOverrideFile?.serviceClass?.methods?[apiMethodIdentifierWithoutServiceName(methodId)]?.paramNames {
             return overrideNames
         } else {
             return nil
         }
     }
     
-    class func overrideAPIEnumCaseNames(resourceName resourceName: String, propertyName: String, input: String) -> String? {
+    class func overrideAPIEnumCaseNames(resourceName: String, propertyName: String, input: String) -> String? {
         let id: String
         if resourceName == "" {
             id = propertyName
         } else {
-            id = [resourceName, propertyName].joinWithSeparator(".")
+            id = [resourceName, propertyName].joined(separator: ".")
         }
-        return APIOverrideFile?.enums[id]?.overrideNameForInput(input)
+        return APIOverrideFile?.enums?[id]?.overrideName(forInput: input)
     }
     
-    class func overrideAPIGlobalQueryParam(propertyName: String) -> OverrideProperty? {
-        return APIOverrideFile?.serviceClass.params[propertyName]
+    class func overrideAPIGlobalQueryParam(_ propertyName: String) -> OverrideProperty? {
+        return APIOverrideFile?.serviceClass?.params?[propertyName]
     }
     
-    class func overrideAPIMethodQueryParam(methodId: String, propertyName: String) -> OverrideProperty? {
+    class func overrideAPIMethodQueryParam(_ methodId: String, propertyName: String) -> OverrideProperty? {
         let methodString = apiMethodIdentifierWithoutServiceName(methodId)
-        return APIOverrideFile?.serviceClass.methods[methodString]?.queryParams?[propertyName]
+        return APIOverrideFile?.serviceClass?.methods?[methodString]?.queryParams?[propertyName]
     }
     
-    class func overrideModelClass(className className: String) -> OverrideModelClass? {
+    class func overrideModelClass(className: String) -> OverrideModelClass? {
         return APIOverrideFile?.modelClasses?[className]
     }
     
-    class func overrideModelClassProperty(name name: String, className: String) -> OverrideProperty? {
+    class func overrideModelClassProperty(name: String, className: String) -> OverrideProperty? {
         return overrideModelClass(className: className)?.properties?[name]
     }
     
@@ -64,10 +64,10 @@ class OverrideFileManager {
         return APIOverrideFile?.serviceClass.scopesEnum?[name]
     }
     
-    private class func apiMethodIdentifierWithoutServiceName(identifier: String) -> String {
+    fileprivate class func apiMethodIdentifierWithoutServiceName(_ identifier: String) -> String {
         let id = identifier
-        var parts = id.componentsSeparatedByString(".")
+        var parts = id.components(separatedBy: ".")
         parts.removeFirst()
-        return parts.joinWithSeparator(".")
+        return parts.joined(separator: ".")
     }
 }

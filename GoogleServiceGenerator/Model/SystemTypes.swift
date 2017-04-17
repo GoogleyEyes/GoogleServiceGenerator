@@ -7,32 +7,28 @@
 //
 
 import Cocoa
+import Alamofire
 
 enum Types: String {
     // System Types
     case String = "String"
-    case NSURL = "NSURL"
+    case URL = "URL"
     case Int = "Int"
     case UInt = "UInt"
     case Array = "Array"
-    case Any = "Any"
+    case any = "Any"
     case Bool = "Bool"
     case Double = "Double"
     case Float = "Float"
     case AnyObject = "AnyObject"
     case UInt64 = "UInt64"
-    case NSDate = "NSDate"
+    case Date = "Date"
     case Int64 = "Int64"
-    case NSData = "NSData"
+    case Data = "Data"
     
     // ObjectMapper
-    case Mappable = "Mappable"
-    case Map = "Map"
-    case URLTransform = "URLTransform"
-    case DateTransform = "DateTransform"
-    case ISO8601DateTransrom = "ISO8601DateTransform"
-    case RFC3339Transform = "RFC3339Transform"
-    case Base64Transform = "Base64Transform"
+    case FromJSON = "FromJSON"
+    case JSON = "JSON"
 }
 
 extension Types {
@@ -68,11 +64,11 @@ extension Types {
                     if let strFormat = format {
                         switch strFormat {
                             case "byte":
-                                selfValue = Types.NSData.rawValue
+                                selfValue = Types.Data.rawValue
                             case "date":
-                                selfValue = Types.NSDate.rawValue
+                                selfValue = Types.Date.rawValue
                             case "date-time":
-                                selfValue = Types.NSDate.rawValue
+                                selfValue = Types.Date.rawValue
                             case "int64":
                                 selfValue = Types.Int64.rawValue
                             case "uint64":
@@ -83,7 +79,7 @@ extension Types {
                         selfValue = Types.String.rawValue
                     }
                 case "any":
-                    selfValue = Types.Any.rawValue
+                    selfValue = Types.any.rawValue
                 default: selfValue = ""
             }
         }
@@ -91,23 +87,18 @@ extension Types {
         
         return Types(rawValue: selfValue)
     }
-    
-    static func transformType(forType type: Types?) -> Types? {
-        let returnType: Types?
-        if let existingType = type {
-            switch existingType {
-            case .NSURL:
-                returnType = .URLTransform
-            case .NSDate:
-                returnType = .RFC3339Transform
-            case .NSData:
-                returnType = .Base64Transform
-            default:
-                returnType = nil
-            }
-        } else {
-            returnType = nil
+}
+
+extension Alamofire.HTTPMethod {
+    var codeString: String {
+        switch self {
+        case .get: return "get"
+        case .post: return "post"
+        case .put: return "put"
+        case .delete: return "delete"
+        case .patch: return "patch"
+        case .head: return "head"
+        default: return ""
         }
-        return returnType
     }
 }

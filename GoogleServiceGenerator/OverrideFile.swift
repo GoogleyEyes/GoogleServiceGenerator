@@ -9,13 +9,13 @@
 import Cocoa
 import ObjectMapper
 
-var APIOverrideFile: OverrideFile?
+var APIOverrideFile: OverrideFile!
 
-func loadOverrideFile(serviceName: String) {
-    if let path = NSBundle.mainBundle().pathForResource("\(serviceName).override", ofType: "json") {
+func loadOverrideFile(_ serviceName: String) {
+    if let path = Bundle.main.path(forResource: "\(serviceName).override", ofType: "json") {
         if let fileData = NSData(contentsOfFile: path) {
-            if let fileString = NSString(data: fileData, encoding: NSUTF8StringEncoding) {
-                APIOverrideFile = Mapper<OverrideFile>().map(fileString)
+            if let fileString = NSString(data: fileData as Data, encoding: String.Encoding.utf8.rawValue) {
+                APIOverrideFile = Mapper<OverrideFile>().map(JSONString: fileString as String)
             }
         }
     }
@@ -26,7 +26,7 @@ class OverrideFile: Mappable {
     var serviceClass: OverrideServiceClass!
     var modelClasses: [String: OverrideModelClass]!
     
-    required init?(_ map: Map) {
+    required init?(map: Map) {
         
     }
     
@@ -40,29 +40,29 @@ class OverrideFile: Mappable {
 class OverrideEnum: Mappable {
     var enumDict: [String: String]!
     
-    required init?(_ map: Map) {
+    required init?(map: Map) {
         
     }
     
     func mapping(map: Map) {
-        enumDict = map.JSONDictionary as? [String: String]
+        enumDict = map.JSON as? [String: String]
     }
     
-    func overrideNameForInput(input: String) -> String? {
+    func overrideName(forInput input: String) -> String? {
         return enumDict[input]
     }
     
     subscript(input: String) -> String? {
-        return overrideNameForInput(input)
+        return overrideName(forInput: input)
     }
 }
 
 class OverrideServiceClass: Mappable {
     var params: [String: OverrideProperty]!
     var methods: [String: OverrideServiceClassMethod]!
-    var scopesEnum: [String: String]?
+    var scopesEnum: [String: String]!
     
-    required init?(_ map: Map) {
+    required init?(map: Map) {
         
     }
     
@@ -79,7 +79,7 @@ class OverrideProperty: Mappable {
     var type: String?
     var hasDefaultValue: Bool = false
     
-    required init?(_ map: Map) {
+    required init?(map: Map) {
         
     }
     
@@ -97,7 +97,7 @@ class OverrideServiceClassMethod: Mappable {
     var fullMethodName: String?
     var queryParams: [String: OverrideProperty]?
     
-    required init?(_ map: Map) {
+    required init?(map: Map) {
         
     }
     
@@ -117,12 +117,12 @@ class OverrideServiceClassMethodParamNames: Mappable {
         return namesDict[indexString]
     }
     
-    required init?(_ map: Map) {
+    required init?(map: Map) {
         
     }
     
     func mapping(map: Map) {
-        namesDict = map.JSONDictionary as? [String: String]
+        namesDict = map.JSON as? [String: String]
     }
 }
 
@@ -130,7 +130,7 @@ class OverrideModelClass: Mappable {
     var properties: [String: OverrideProperty]?
     var type: String?
     
-    required init?(_ map: Map) {
+    required init?(map: Map) {
         
     }
     

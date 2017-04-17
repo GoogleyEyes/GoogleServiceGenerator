@@ -12,7 +12,7 @@ import GoogleAPIs
 class SchemaToModelEnumTransformer {
     var serviceName: String = Generator.sharedInstance.serviceName
     
-    func enumFromSchema(propertyName: String, resourceName: String, propertyInfo: DiscoveryJSONSchema) -> ModelEnum {
+    func enumFromSchema(_ propertyName: String, resourceName: String, propertyInfo: DiscoveryJSONSchema) -> ModelEnum {
         // 1) Name
         let enumName = serviceName + resourceName.objcName(shouldCapitalize: true) + propertyName.objcName(shouldCapitalize: true)
         // 1) Type
@@ -37,11 +37,11 @@ class SchemaToModelEnumTransformer {
                 return value
             }
             
-            return rawValue.objcName(shouldCapitalize: true)
+            return rawValue.objcName(shouldCapitalize: false)
         }
         // 3a) Case Descriptions
         let caseDescriptions = propertyInfo.enumDescriptions
         // 4) put it all together
-        return ModelEnum(name: enumName, type: enumType, typeDescription: typeDescription, cases: enumCases, caseNames: caseNames, caseDescriptions: caseDescriptions)
+        return ModelEnum(name: enumName, type: enumType, typeDescription: typeDescription!, cases: enumCases!, caseNames: caseNames, caseDescriptions: caseDescriptions!)
     }
 }

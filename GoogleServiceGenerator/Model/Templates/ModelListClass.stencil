@@ -1,0 +1,48 @@
+{% if description %}
+/**
+ {{ description }}
+ */{% endif %}
+public struct {{ name }} {
+    {% for property in properties %}
+    {{ property.declaration }}
+    {% endfor %}
+
+    public init() {
+
+    }
+}
+
+extension {{ name }}: {{ listType }} {
+    public init(json: JSON) {
+        {% for property in properties %}{{ property.initWithJSONMethodLine }}
+        {% endfor %}
+    }
+
+    public func toJSON() -> JSON {
+        var dict = [String: Any]()
+        {% for property in properties %}{{ property.toJSONMethodLine }}
+        {% endfor %}
+        return JSON(dict)
+    }
+}
+
+extension {{ name }}: ExpressibleByArrayLiteral {
+    public init(arrayLiteral elements: {{ itemType }}...) {
+        items = elements
+    }
+}
+
+extension {{ name }}: Sequence {
+    public typealias Iterator = IndexingIterator<[{{ itemType }}]>
+
+    public func makeIterator() -> Iterator {
+        let objects = items as [{{ itemType }}]
+        return objects.makeIterator()
+    }
+}
+
+extension {{ name }} {
+    public subscript(position: Int) -> {{ itemType }} {
+        return items[position]
+    }
+}

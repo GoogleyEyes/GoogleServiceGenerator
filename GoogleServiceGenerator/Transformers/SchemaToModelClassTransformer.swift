@@ -12,7 +12,7 @@ import GoogleAPIs
 class SchemaToModelClassTransformer {
     var serviceName: String = Generator.sharedInstance.serviceName
     
-    func modelClassFromSchema(schemaName: String, schema: DiscoveryJSONSchema) -> ModelClass {
+    func modelClassFromSchema(_ schemaName: String, schema: DiscoveryJSONSchema) -> ModelClass {
         // 1) class name
         let className = serviceName + schemaName
         // 2) properties
@@ -39,10 +39,10 @@ class SchemaToModelClassTransformer {
             description = "The \(schemaName) model type for use with the \(serviceName) API"
         }
         // 5) put it all together
-        return ModelClass(className: className, superclass: superclass, properties: properties, description: description)
+        return ModelClass(className: className, supertype: superclass, properties: properties, description: description)
     }
     
-    func modelListClassFromSchema(schemaName: String, schema: DiscoveryJSONSchema) -> ModelListClass {
+    func modelListClassFromSchema(_ schemaName: String, schema: DiscoveryJSONSchema) -> ModelListClass {
         // 1) class name
         let className = serviceName + schemaName
         // 2a) list type
@@ -58,7 +58,7 @@ class SchemaToModelClassTransformer {
         // 2b) item type
         let itemType = serviceName + schema.properties["items"]!.items.xRef!
         // 3) properties
-        var properties = propertiesFromSchemaProperties(schema.properties, resourceName: "", className: className)
+        let properties = propertiesFromSchemaProperties(schema.properties, resourceName: "", className: className)
 //        let itemProperties = weedOutItemsProperties(properties)
 //        for property in itemProperties {
 //            if property.type != "[Type]" {
@@ -78,7 +78,7 @@ class SchemaToModelClassTransformer {
         return ModelListClass(className: className, properties: properties, itemType: itemType, itemsPropertyDescription: itemsDescription, listType: listType, classDescription: description)
     }
     
-    private func weedOutItemsProperties(array: [Property]) -> [Property] {
+    fileprivate func weedOutItemsProperties(_ array: [Property]) -> [Property] {
         var itemProperties: [Property] = []
         for property in array {
             if property.name == "items" {
@@ -89,7 +89,7 @@ class SchemaToModelClassTransformer {
     }
     
     // For those model classes not specifically conforming to GoogleObject
-    func subModelClassFromSchema(schemaName: String, resourceName: String, schema: DiscoveryJSONSchema) -> ModelClass {
+    func subModelClassFromSchema(_ schemaName: String, resourceName: String, schema: DiscoveryJSONSchema) -> ModelClass {
         // 1) class name
         var className = serviceName + resourceName.objcName(shouldCapitalize: true) + schemaName
         if schema.type == "array" {
@@ -107,10 +107,10 @@ class SchemaToModelClassTransformer {
         // 3) description
         let description = "The \(schemaName) subtype of the \(resourceName.objcName(shouldCapitalize: true)) model type for use with the \(serviceName) API"
         // 4) put it all together
-        return ModelClass(className: className, superclass: "ObjectType", properties: properties, description: description)
+        return ModelClass(className: className, supertype: "ObjectType", properties: properties, description: description)
     }
     
-    func subModelClassForArrayValueTypeObjectFromSchema(schemaName: String, resourceName: String, schema: DiscoveryJSONSchema) -> ModelClass {
+    func subModelClassForArrayValueTypeObjectFromSchema(_ schemaName: String, resourceName: String, schema: DiscoveryJSONSchema) -> ModelClass {
         // 1) class name
         let className = serviceName + resourceName.objcName(shouldCapitalize: true) + schemaName
         // 2) properties
@@ -119,12 +119,15 @@ class SchemaToModelClassTransformer {
         // 3) description
         let description = "The \(schemaName) subtype of the \(resourceName.objcName(shouldCapitalize: true)) model type for use with the \(serviceName) API"
         // 4) put it all together
-        return ModelClass(className: className, superclass: "ObjectType", properties: properties, description: description)
+        return ModelClass(className: className, supertype: "ObjectType", properties: properties, description: description)
     }
     
     func generateProperty(forName name: String, info: DiscoveryJSONSchema, resourceName: String) -> Property {
         // 1) property type
         var propertyType = ""
+        var arrayItemType: String? = nil
+        var dictionaryItemType: String? = nil
+        var isModelType: Bool = false
         // 2) isEnum
         var isEnum: Bool = false
         if info.enumValues != nil {
@@ -139,32 +142,36 @@ class SchemaToModelClassTransformer {
                 var typeName: String = ""
                 if let arrayType = info.items.xRef { // array of object already declared
                     typeName = "[\(serviceName + arrayType)]"
+                    arrayItemType = typeName
                 } else if info.properties != nil || info.items.properties != nil { // array of a new type of object
                     var name = serviceName + resourceName.objcName(shouldCapitalize: true) + name.objcName(shouldCapitalize: true)
                     if name.characters.last == "s" {
                         name = String(name.characters.dropLast())
                     }
                     typeName = "[\(name)]"
+                    arrayItemType = name
                 } else if info.items.type != nil && info.items.type != "object" { // array of primitive
                     let name = (Types.type(forDiscoveryType: info.items.type, format: info.items.format)?.rawValue)!
                     typeName = "[\(name)]"
+                    arrayItemType = name
                 }
                 propertyType = typeName
             } else if type == "object" && info.properties != nil {
                 propertyType = serviceName + resourceName.objcName(shouldCapitalize: true) + name.objcName(shouldCapitalize: true)
+                isModelType = true
             } else if info.additionalProperties != nil && info.additionalProperties.xRef != nil {
                 propertyType = "[String: \(serviceName + info.additionalProperties.xRef)]"
+                dictionaryItemType = serviceName + info.additionalProperties.xRef
             }
         } else if info.xRef != nil {
             propertyType = serviceName + info.xRef!
+            isModelType = true
         }
-        // 3) Transform Type
-        let transformType = Types.transformType(forType: Types(rawValue: propertyType))?.rawValue
         // 4) Default Value
         var defaultValue = info.defaultValue
         if defaultValue != nil {
             if info.enumValues != nil {
-                defaultValue = ".\(info.defaultValue!.objcName(shouldCapitalize: true))"
+                defaultValue = ".\(info.defaultValue!.objcName(shouldCapitalize: false))"
             } else if propertyType == Types.String.rawValue {
                 defaultValue = "\"\(info.defaultValue!)\""
             }
@@ -176,7 +183,7 @@ class SchemaToModelClassTransformer {
             optionality = OptionalityOnType.NonOptional
         }
         // 6) Required
-        let required = (info.required != nil) ? true : false
+        let required = info.required
         // 7) Description
         let desc = info.schemaDescription
         
@@ -184,10 +191,10 @@ class SchemaToModelClassTransformer {
         let location = info.location
         
         // 9) put it all together
-        return Property(nameFoundInJSONSchema: name, type: propertyType, optionality: optionality, transformType: transformType, defaultValue: defaultValue, required: required, description: desc, isEnum: isEnum, location: location)
+        return Property(nameFoundInJSONSchema: name, type: propertyType, optionality: optionality, defaultValue: defaultValue, required: required, description: desc, isEnum: isEnum, location: location, arrayItemType: arrayItemType, dictionaryItemType: dictionaryItemType, isModelType: isModelType)
     }
     
-    func propertiesFromSchemaProperties(schemaProperties: [String: DiscoveryJSONSchema], resourceName: String, className: String) -> [Property] {
+    func propertiesFromSchemaProperties(_ schemaProperties: [String: DiscoveryJSONSchema], resourceName: String, className: String) -> [Property] {
         var properties: [Property] = []
         for (propertyName, propertyInfo) in schemaProperties {
             let property = generateProperty(forName: propertyName, info: propertyInfo, resourceName: resourceName)

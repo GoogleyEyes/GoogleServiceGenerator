@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import Stencil
 
 class ServiceClass: SourceFileGeneratable, CustomStringConvertible {
     var apiName: String
@@ -36,55 +37,29 @@ class ServiceClass: SourceFileGeneratable, CustomStringConvertible {
     }
     
     override func generateSourceFileString() -> String {
-        // 1) class declaration
-        var string = classDescription.documentationString()
-        string.addNewLine()
-        string += "public class \(name): GoogleService {"
-        string.addNewLine(); string.addTab()
-        
-        // 2) GoogleService conformance
-        string += generateGoogleServiceConformance()
-        string.addNewLine(); string.addNewLine(); string.addTab()
-        
-        // 3) global query params
-        for queryParam in globalQueryParams {
-            string += "\(queryParam)"
-            string.addNewLine(); string.addTab()
+        let globalQueryParamsStrings = globalQueryParams.map { (property) -> [String: String] in
+            return ["declaration": "\(property)"]
         }
-        string.addNewLine(); string.addTab()
-        
-        // 4) API methods
-        for method in apiMethods {
-            string += method.generateSourceFileString()
-            string.addNewLine(); string.addNewLine(); string.addTab()
+        let methods = apiMethods.map {
+            $0.generateSourceFileString()
         }
-        
-        // 5) setUpQueryParams
-        string += generateSetUpQueryParams()
-        string.addNewLine()
-        string += "}"
-        return string
-    }
-    
-    func generateGoogleServiceConformance() -> String {
-        // 1) apiNameInURL
-        var string = "var apiNameInURL: String = \"\(apiName)\""
-        string.addNewLine(); string.addTab()
-        
-        // 2) apiVersionString
-        string += "var apiVersionString: String = \"\(apiVersion)\""
-        string.addNewLine(); string.addNewLine(); string.addTab()
-        
-        // 5) fetcher
-        string += "public let fetcher: GoogleServiceFetcher = GoogleServiceFetcher()"
-        string.addNewLine(); string.addNewLine(); string.addTab()
-        
-        string += "public required init() {"
-        string.addNewLine(); string.addNewLine(); string.addTab()
-        string += "}"
-        
-        
-        return string
+        let context = Context(dictionary: [
+            "globalQueryParams": globalQueryParamsStrings,
+            "name": name,
+            "setUpQueryParams": generateSetUpQueryParams(),
+            "apiName": apiName,
+            "apiVersion": apiVersion,
+            "description": classDescription,
+            "apiMethods": methods
+            ])
+        do {
+            let template = try Template(named: "ServiceClass.stencil")
+            let rendered = try template.render(context)
+            return rendered
+        } catch {
+            print("Failed to render template \(error) for class \(name)")
+            return ""
+        }
     }
     
     func generateSetUpQueryParams() -> String {
@@ -127,7 +102,7 @@ class APIMethod: SourceFileGeneratable, CustomStringConvertible {
     var returnTypeVariableName: String // (schema name).objcName(shouldCapitalize: false)
     var endpoint: String
     weak var serviceClass: ServiceClass!
-    var requestMethod: Alamofire.Method
+    var requestMethod: Alamofire.HTTPMethod
     var jsonPostBodyType: String?
     var jsonPostBodyVarName: String?
     var supportsMediaUpload: Bool
@@ -135,9 +110,9 @@ class APIMethod: SourceFileGeneratable, CustomStringConvertible {
     
     var methodDescription: String
     
-    private var queryParams: [Property]
+    fileprivate var queryParams: [Property]
     
-    init(name: String, requestMethod: Alamofire.Method = .GET, parameters: [Property], jsonPostBodyType: String? = nil, jsonPostBodyVarName: String? = nil, supportsMediaUpload: Bool = false, returnType: String?, returnTypeVariableName: String? = nil, endpoint: String, serviceClass: ServiceClass, description: String, methodId: String) {
+    init(name: String, requestMethod: Alamofire.HTTPMethod = .get, parameters: [Property], jsonPostBodyType: String? = nil, jsonPostBodyVarName: String? = nil, supportsMediaUpload: Bool = false, returnType: String?, returnTypeVariableName: String? = nil, endpoint: String, serviceClass: ServiceClass, description: String, methodId: String) {
         self.parameters = parameters
         self.requiredParams = []
         self.serviceClass = serviceClass
@@ -165,7 +140,7 @@ class APIMethod: SourceFileGeneratable, CustomStringConvertible {
         if jsonPostBodyType != nil {
             let reqpar = self.requiredParams
             var newReqPar = [Property(nameFoundInJSONSchema: jsonPostBodyVarName!, type: jsonPostBodyType!, optionality: .NonOptional, required: true, description: "Post Body")]
-            newReqPar.appendContentsOf(reqpar)
+            newReqPar.append(contentsOf: reqpar)
             self.requiredParams = newReqPar
         }
         self.supportsMediaUpload = supportsMediaUpload
@@ -181,24 +156,8 @@ class APIMethod: SourceFileGeneratable, CustomStringConvertible {
         return generateMethodName()
     }
     
-    override func generateSourceFileString() -> String {
-        // 1) Non-required query param declarations
+    var setUpQueryParams: String {
         var string = ""
-        for queryParam in nonRequiredParams {
-            string += queryParam.generateSourceFileString()
-            string.addNewLine(); string.addTab()
-            if queryParam == nonRequiredParams.last! {
-                string.addNewLine(); string.addTab()
-            }
-        }
-        
-        // 2) Method name
-        string += methodDescription.documentationString()
-        string.addNewLine(); string.addTab()
-        string += generateMethodName() + " {"
-        string.addNewLine()
-        string.addTab(); string.addTab()
-        
         // 3) setUpQueryParams
         if queryParams.count > 0 {
             string += "var queryParams = setUpQueryParams()"
@@ -233,63 +192,61 @@ class APIMethod: SourceFileGeneratable, CustomStringConvertible {
             
             string.addNewLine(); string.addTab(); string.addTab()
         }
-        
+        return string
+    }
+    
+    var performRequestCall: String {
+        var string = ""
         // 4) performRequest
-        let endpointStr = endpoint.stringByReplacingOccurrencesOfString("{", withString: "\\(").stringByReplacingOccurrencesOfString("}", withString: ")")
-        if requestMethod == .GET {
+        let endpointStr = endpoint.replacingOccurrences(of: "{", with: "\\(").replacingOccurrences(of: "}", with: ")")
+        if requestMethod == .get {
             string += "fetcher.performRequest(serviceName: apiNameInURL, apiVersion: apiVersionString, endpoint: \"\(endpointStr)\", queryParams: queryParams"
         } else if jsonPostBodyType != nil {
-            string += "fetcher.performRequest(.\(requestMethod.rawValue), serviceName: apiNameInURL, apiVersion: apiVersionString, endpoint: \"\(endpointStr)\", queryParams: queryParams, postBody: Mapper<\(jsonPostBodyType!)>().toJSON(\(jsonPostBodyVarName!))"
+            string += "fetcher.performRequest(.\(requestMethod.codeString), serviceName: apiNameInURL, apiVersion: apiVersionString, endpoint: \"\(endpointStr)\", queryParams: queryParams, postBody: \(jsonPostBodyVarName!).toJSON()"
         } else {
-            string += "fetcher.performRequest(.\(requestMethod.rawValue), serviceName: apiNameInURL, apiVersion: apiVersionString, endpoint: \"\(endpointStr)\", queryParams: queryParams"
+            string += "fetcher.performRequest(.\(requestMethod.codeString), serviceName: apiNameInURL, apiVersion: apiVersionString, endpoint: \"\(endpointStr)\", queryParams: queryParams"
         }
         
         if supportsMediaUpload {
             string += ", uploadParameters: uploadParameters"
         }
         
-        string += ") { (JSON, error) -> () in"
-        
-        string.addNewLine(); string.addTab(); string.addTab(); string.addTab()
-        if returnType != Types.Bool.rawValue {
-            // 4.1) completionHandler
-            string += "if error != nil {"
-            string.addNewLine(); string.addTab(); string.addTab(); string.addTab(); string.addTab()
-            string += "completionHandler(\(returnTypeVariableName): nil, error: error)"
-            string.addNewLine(); string.addTab(); string.addTab(); string.addTab()
-            string += "} else if JSON != nil {"
-            string.addNewLine(); string.addTab(); string.addTab(); string.addTab(); string.addTab()
-            string += "let \(returnTypeVariableName) = Mapper<\(returnType)>().map(JSON)"
-            string.addNewLine(); string.addTab(); string.addTab(); string.addTab(); string.addTab()
-            string += "completionHandler(\(returnTypeVariableName): \(returnTypeVariableName), error: nil)"
-            string.addNewLine(); string.addTab(); string.addTab(); string.addTab()
-            string += "}"
-            string.addNewLine(); string.addTab(); string.addTab()
-            string += "}"
-            string.addNewLine(); string.addTab()
-        } else {
-            // 4.1) completionHandler
-            string += "if error != nil {"
-            string.addNewLine(); string.addTab(); string.addTab(); string.addTab(); string.addTab()
-            string += "completionHandler(success: false, error: error)"
-            string.addNewLine(); string.addTab(); string.addTab(); string.addTab()
-            string += "} else {"
-            string.addNewLine(); string.addTab(); string.addTab(); string.addTab(); string.addTab()
-            string += "completionHandler(success: true, error: nil)"
-            string.addNewLine(); string.addTab(); string.addTab(); string.addTab()
-            string += "}"
-            string.addNewLine(); string.addTab(); string.addTab()
-            string += "}"
-            string.addNewLine(); string.addTab()
-        }
-        
-        
-        // 5) closing bracket
-        string += "}"
+        string += ")"
         return string
     }
     
-    private func generateMethodName() -> String {
+    override func generateSourceFileString() -> String {
+        let nonRequiredParamsStrings = nonRequiredParams.map { (property) -> [String: String] in
+            return ["declaration": "\(property)"]
+        }
+        var serialization: String
+        var valueVar: String
+        if returnType == "Bool" {
+            serialization = "completionHandler(.success(true))"
+            valueVar = "_"
+        } else {
+            serialization = "completionHandler(.success(\(returnType)(json: value)))"
+            valueVar = "let value"
+        }
+        let context = Context(dictionary: [
+                "nonRequiredParams": nonRequiredParamsStrings,
+                "name": generateMethodName(),
+                "setUpQueryParams": setUpQueryParams,
+                "performRequestCall": performRequestCall,
+                "serialization": serialization,
+                "valueVar": valueVar
+            ])
+        do {
+            let template = try Template(named: "ServiceClassMethod.stencil")
+            let rendered = try template.render(context)
+            return rendered
+        } catch {
+            print("Failed to render template \(error) for method \(name)")
+            return ""
+        }
+    }
+    
+    fileprivate func generateMethodName() -> String {
         
         // 1) initial method name
         var string = "public func "
@@ -307,15 +264,13 @@ class APIMethod: SourceFileGeneratable, CustomStringConvertible {
             for param in requiredParams {
                 if param == requiredParams.first! {
                     
-                    let firstParamName: String?
+                    var firstParamName: String? = nil
                     if let override = overrideParamNames?[0] {
                         if override != "_" {
                             firstParamName = override
                         } else {
                             firstParamName = nil
                         }
-                    } else {
-                        firstParamName = param.name
                     }
                     if firstParamName != nil {
                         string += "\(firstParamName!) "
@@ -328,7 +283,7 @@ class APIMethod: SourceFileGeneratable, CustomStringConvertible {
                     string += ", "
                 } else {
                     
-                    if let overrideParamName = overrideParamNames?[requiredParams.indexOf(param)!] {
+                    if let overrideParamName = overrideParamNames?[requiredParams.index(of: param)!] {
                         string += "\(overrideParamName) "
                     }
                     
@@ -348,7 +303,7 @@ class APIMethod: SourceFileGeneratable, CustomStringConvertible {
         }
         
         // 4) completion handler
-        string += "completionHandler: (\(returnTypeVariableName): \(returnType)?, error: NSError?) -> ())"
+        string += "completionHandler: @escaping (_ result: GoogleResult<\(returnType)>) -> ())"
         
         return string
     }

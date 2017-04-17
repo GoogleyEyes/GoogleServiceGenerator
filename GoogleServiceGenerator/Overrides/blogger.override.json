@@ -13,65 +13,72 @@
           "type": "BloggerPageAuthorImage"
         }
       }
+    },
+    "BloggerPostAuthor": {
+        "properties": {
+            "image": {
+                "type": "BloggerPostAuthorImage"
+            }
+        }
     }
   },
   "enums": {
-    "alt": {
-      "json": "JSON"
-    },
     "posts.view": {
-      "ADMIN": "Admin",
-      "AUTHOR": "Author",
-      "READER": "Reader"
+      "ADMIN": "admin",
+      "AUTHOR": "author",
+      "READER": "reader"
     },
     "blogs.view": {
-      "ADMIN": "Admin",
-      "AUTHOR": "Author",
-      "READER": "Reader"
+        "ADMIN": "admin",
+        "AUTHOR": "author",
+        "READER": "reader"
     },
     "pages.view": {
-      "ADMIN": "Admin",
-      "AUTHOR": "Author",
-      "READER": "Reader"
+        "ADMIN": "admin",
+        "AUTHOR": "author",
+        "READER": "reader"
     },
     "comments.view": {
-      "ADMIN": "Admin",
-      "AUTHOR": "Author",
-      "READER": "Reader"
+        "ADMIN": "admin",
+        "AUTHOR": "author",
+        "READER": "reader"
     },
     "postUserInfos.view": {
-      "ADMIN": "Admin",
-      "AUTHOR": "Author",
-      "READER": "Reader"
+        "ADMIN": "admin",
+        "AUTHOR": "author",
+        "READER": "reader"
     },
     "blogs.role": {
-      "ADMIN": "Admin",
-      "AUTHOR": "Author",
-      "READER": "Reader"
+        "ADMIN": "admin",
+        "AUTHOR": "author",
+        "READER": "reader"
     },
     "blogs.status": {
-      "DELETED": "Deleted",
-      "LIVE": "Live"
+      "DELETED": "deleted",
+      "LIVE": "live"
     },
     "pageViews.range": {
-      "30DAYS": "X30Days",
-      "7DAYS": "X7Days"
+      "30DAYS": "x30Days",
+      "7DAYS": "x7Days"
     }
   },
   "serviceClass": {
+    "scopesEnum": {
+        "Blogger": "blogger"
+    }
     "params": {
       "quotaUser": {
         "name": "quotaUserId"
       },
       "alt": {
-        "defaultValue": ".JSON"
+        "defaultValue": ".json"
       }
     },
     "methods": {
       "postUserInfos.list": {
         "queryParams": {
             "orderBy": {
-                "defaultValue": ".Published"
+                "defaultValue": ".published"
             }
         },
         "paramNames": {
@@ -97,10 +104,10 @@
         }
       },
       "posts.publish": {
-        "fullMethodName": "publishPost(withId postId: String, toBlogWithId blogId: String, completionHandler: (post: BloggerPost?, error: NSError?) -> ())"
+        "fullMethodName": "publishPost(withId postId: String, toBlogWithId blogId: String, completionHandler: @escaping (_ result: GoogleResult<BloggerPost>) -> ())"
       },
       "posts.delete": {
-        "fullMethodName": "deletePost(withId postId: String, fromBlogWithId blogId: String, completionHandler: (success: Bool, error: NSError?) -> ())"
+        "fullMethodName": "deletePost(withId postId: String, fromBlogWithId blogId: String, completionHandler: @escaping (_ result: GoogleResult<Bool>) -> ())"
       },
       "posts.patch": {
         "baseName": "patchPost",
@@ -123,16 +130,22 @@
         }
       },
       "posts.get": {
-        "fullMethodName": "getPost(withId postId: String, blogId: String, completionHandler: (post: BloggerPost?, error: NSError?) -> ())"
+        "fullMethodName": "getPost(withId postId: String, blogId: String, completionHandler: @escaping (_ result: GoogleResult<BloggerPost>) -> ())"
       },
       "posts.revert": {
-        "fullMethodName": "revertPost(withId postId: String, blogId: String, completionHandler: (post: BloggerPost?, error: NSError?) -> ())"
+        "fullMethodName": "revertPost(withId postId: String, blogId: String, completionHandler: @escaping (_ result: GoogleResult<BloggerPost>) -> ())"
       },
       "posts.search": {
         "paramNames": {
-          "0": "query"
+          "0": "inBlogWithId",
+          "1": "withQuery"
         }
       },
+        "posts.list": {
+            "paramNames": {
+                "0": "forBlogId"
+            }
+        },
       "users.get": {
         "baseName": "getUser",
         "paramNames": {
@@ -140,13 +153,13 @@
         }
       },
       "comments.markAsSpam": {
-        "fullMethodName": "markCommentAsSpam(withId commentId: String, inPostWithId postId: String, blogId: String, completionHandler: (comment: BloggerComment?, error: NSError?) -> ())"
+        "fullMethodName": "markCommentAsSpam(withId commentId: String, inPostWithId postId: String, blogId: String, completionHandler: @escaping (_ result: GoogleResult<BloggerComment>) -> ())"
       },
       "comments.removeContent": {
-        "fullMethodName": "removeContentFromComment(withId commentId: String, inPostWithId postId: String, blogId: String, completionHandler: (comment: BloggerComment?, error: NSError?) -> ())"
+        "fullMethodName": "removeContentFromComment(withId commentId: String, inPostWithId postId: String, blogId: String, completionHandler: @escaping (_ result: GoogleResult<BloggerComment>) -> ())"
       },
       "comments.delete": {
-        "fullMethodName": "deleteComment(withId commentId: String, fromPostWithId postId: String, blogId: String, completionHandler: (success: Bool?, error: NSError?) -> ())"
+        "fullMethodName": "deleteComment(withId commentId: String, fromPostWithId postId: String, blogId: String, completionHandler: @escaping (_ result: GoogleResult<Bool>) -> ())"
       },
       "comments.get": {
         "baseName": "getComment",
@@ -165,7 +178,7 @@
         }
       },
       "comments.approve": {
-        "fullMethodName": "approveComment(withId commentId: String, forPostWithId postId: String, blogId: String, completionHandler: (comment: BloggerComment?, error: NSError?) -> ())"
+        "fullMethodName": "approveComment(withId commentId: String, forPostWithId postId: String, blogId: String, completionHandler: @escaping (_ result: GoogleResult<BloggerComment>) -> ())"
       },
       "comments.listByBlog": {
         "baseName": "listComments",
@@ -204,10 +217,10 @@
         }
       },
       "pages.publish": {
-        "fullMethodName": "publishPage(withId pageId: String, toBlogWithId blogId: String, completionHandler: (page: BloggerPage?, error: NSError?) -> ())"
+        "fullMethodName": "publishPage(withId pageId: String, toBlogWithId blogId: String, completionHandler: @escaping (_ result: GoogleResult<BloggerPage>) -> ())"
       },
       "pages.delete": {
-        "fullMethodName": "deletePage(withId pageId: String, fromBlogWithId blogId: String, completionHandler: (success: Bool, error: NSError?) -> ())"
+        "fullMethodName": "deletePage(withId pageId: String, fromBlogWithId blogId: String, completionHandler: @escaping (_ result: GoogleResult<Bool>) -> ())"
       },
       "pages.patch": {
         "baseName": "patchPage",
@@ -224,10 +237,10 @@
         }
       },
       "pages.get": {
-        "fullMethodName": "getPage(forId pageId: String, fromBlogWithId blogId: String, completionHandler: (page: BloggerPage?, error: NSError?) -> ())"
+        "fullMethodName": "getPage(forId pageId: String, fromBlogWithId blogId: String, completionHandler: @escaping (_ result: GoogleResult<BloggerPage>) -> ())"
       },
       "pages.revert": {
-        "fullMethodName": "revertPage(withId pageId: String, inBlogWithId blogId: String, completionHandler: (page: BloggerPage?, error: NSError?) -> ())"
+        "fullMethodName": "revertPage(withId pageId: String, inBlogWithId blogId: String, completionHandler: @escaping (_ result: GoogleResult<BloggerPage>) -> ())"
       },
       "pages.list": {
         "paramNames": {

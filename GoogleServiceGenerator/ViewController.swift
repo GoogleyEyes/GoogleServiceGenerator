@@ -19,7 +19,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         loadData()
     }
 
-    override var representedObject: AnyObject? {
+    override var representedObject: Any? {
         didSet {
         // Update the view, if already loaded.
         }
@@ -32,34 +32,35 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     func loadData() {
         let discovery = Discovery()
         discovery.preferred = true
-        discovery.listAPIs { (list, error) -> () in
-            if list != nil {
-                self.apiList = list!
-                print(list)
+        discovery.listAPIs { result in
+            switch result {
+            case .success(let value):
+                self.apiList = value
+                print(value)
                 self.tableView.reloadData()
-            } else if error != nil {
+            case .failure(let error):
                 print(error)
             }
         }
     }
     
-    func numberOfRowsInTableView(tableView: NSTableView) -> Int {
+    func numberOfRows(in tableView: NSTableView) -> Int {
         return (apiList != nil) ? apiList.items.count : 0
     }
     
-    func tableView(tableView: NSTableView, objectValueForTableColumn tableColumn: NSTableColumn?, row: Int) -> AnyObject? {
+    func tableView(_ tableView: NSTableView, objectValueFor tableColumn: NSTableColumn?, row: Int) -> Any? {
         let api = apiList[row]
-        return "\(api.title), \(api.version)"
+        return "\(api.title!), \(api.version!)"
     }
     
-    @IBAction func generate(sender: AnyObject) {
+    @IBAction func generate(_ sender: AnyObject) {
         let directory = directoryTextField.stringValue
-        let serviceName = apiList[tableView.selectedRow].name
-        let serviceVersion = apiList[tableView.selectedRow].version
+        let serviceName = apiList[tableView.selectedRow].name!
+        let serviceVersion = apiList[tableView.selectedRow].version!
         
         Generator.sharedInstance.generate(serviceName: serviceName, version: serviceVersion, destinationPath: directory) { (success, error) -> () in
             let alert = NSAlert()
-            alert.addButtonWithTitle("OK")
+            alert.addButton(withTitle: "OK")
             if success {
                 alert.messageText = "Success!"
                 alert.informativeText = "Files successfully generated."
@@ -67,8 +68,8 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
                 alert.messageText = "Error"
                 alert.informativeText = error.debugDescription
             }
-            alert.alertStyle = NSAlertStyle.InformationalAlertStyle
-            alert.beginSheetModalForWindow(self.view.window!, completionHandler: nil)
+            alert.alertStyle = NSAlertStyle.informational
+            alert.beginSheetModal(for: self.view.window!, completionHandler: nil)
         }
     }
     

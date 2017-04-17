@@ -40,7 +40,7 @@ class ModelEnum: SourceFileGeneratable, CustomStringConvertible {
         string.addTab()
         // 2) cases
         for eachCase in cases {
-            let index = Int((cases.indexOf(eachCase)?.toIntMax())!)
+            let index = Int((cases.index(of: eachCase)?.toIntMax())!)
             string += caseDescriptions[index].documentationString()
             string.addNewLine(); string.addTab()
             string += "case \(caseNames[index]) = \(eachCase)"
@@ -57,20 +57,20 @@ class ModelEnum: SourceFileGeneratable, CustomStringConvertible {
 
 class ScopesEnum: SourceFileGeneratable, CustomStringConvertible {
     var values: [String]
-    private var keys: [String]
+    fileprivate var keys: [String]
     var scopeDescriptions: [String]
     
     init(serviceName: String, values: [String], scopeDescriptions: [String]) {
         self.keys = values.map({ (value) -> String in
-            let endOfURL = value.componentsSeparatedByString("/").last!
-            var endComponents = endOfURL.componentsSeparatedByString(".")
-            if endComponents[0].caseInsensitiveCompare(serviceName) == .OrderedSame {
-                endComponents.removeAtIndex(0)
+            let endOfURL = value.components(separatedBy: "/").last!
+            var endComponents = endOfURL.components(separatedBy: ".")
+            if endComponents[0].caseInsensitiveCompare(serviceName) == .orderedSame {
+                endComponents.remove(at: 0)
                 if endComponents == [] {
-                    endComponents.insert(serviceName, atIndex: 0)
+                    endComponents.insert(serviceName, at: 0)
                 }
             }
-            var caseName = String.objcName(components: endComponents, shouldCapitalize: true)
+            var caseName = String.objcName(components: endComponents, shouldCapitalize: false)
             if let overrideCase = OverrideFileManager.overrideScopesEnumCaseName(currentName: caseName) {
                 caseName = overrideCase
             }
@@ -96,7 +96,7 @@ class ScopesEnum: SourceFileGeneratable, CustomStringConvertible {
         
         // 2) cases
         for eachCase in values {
-            let index = Int((values.indexOf(eachCase)?.toIntMax())!)
+            let index = Int((values.index(of: eachCase)?.toIntMax())!)
             string += scopeDescriptions[index].documentationString()
             string.addNewLine(); string.addTab()
             string += "case \(keys[index]) = \(eachCase)"

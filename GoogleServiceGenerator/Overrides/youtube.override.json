@@ -3,39 +3,23 @@
 
   },
   "enums": {
-    "comments.textFormat": {
-      "html": "HTML"
-    },
-    "commentThreads.textFormat": {
-      "html": "HTML"
-    },
     "search.videoDimension": {
-      "2d": "X2D",
-      "3d": "X3D"
+      "2d": "x2D",
+      "3d": "x3D"
     },
-    "captions.tfmt": {
-      "sbv": "SBV",
-      "scc": "SCC",
-      "srt": "SRT",
-      "ttml": "TTML",
-      "vtt": "VTT"
-    },
-    "alt": {
-      "json": "JSON"
-    }
   },
   "serviceClass": {
     "scopesEnum": {
-      "YoutubepartnerChannelAudit": "YoutubePartnerChannelAudit",
-      "Youtubepartner": "YoutubePartner",
-      "ForceSsl": "ForceSSL"
+      "YoutubepartnerChannelAudit": "youtubePartnerChannelAudit",
+      "Youtubepartner": "youtubePartner",
+      "ForceSsl": "forceSSL"
     },
     "params": {
       "quotaUser": {
         "name": "quotaUserId"
       },
       "alt": {
-        "defaultValue": ".JSON"
+        "defaultValue": ".json"
       }
     },
     "methods": {
@@ -218,12 +202,12 @@
       "liveBroadcasts.list": {
         "queryParams": {
           "broadcastType": {
-            "defaultValue": ".Event"
+            "defaultValue": ".event"
           }
         }
       },
       "liveBroadcasts.transition": {
-        "fullMethodName": "transitionLiveBroadcast(withId id: String, toStatus broadcastStatus: YoutubeLiveBroadcastsBroadcastStatus, part: String, completionHandler: (liveBroadcast: YoutubeLiveBroadcast?, error: NSError?) -> ())"
+        "fullMethodName": "transitionLiveBroadcast(withId id: String, to broadcastStatus: YoutubeLiveBroadcastsBroadcastStatus, part: String, completionHandler: @escaping (_ result: GoogleResult<YoutubeLiveBroadcast>) -> ())"
       },
       "comments.markAsSpam": {
         "baseName": "markCommentAsSpam",
@@ -234,7 +218,7 @@
       "comments.insert": {
         "baseName": "replyToComment",
         "paramNames": {
-          "0": "withComment"
+          "0": "with"
         }
       },
       "comments.setModerationStatus": {
@@ -252,7 +236,7 @@
       "comments.list": {
         "queryParams": {
           "textFormat": {
-            "defaultValue": ".HTML"
+            "defaultValue": ".html"
           }
         }
       },
@@ -272,7 +256,7 @@
       "search.list": {
         "queryParams": {
           "order": {
-            "defaultValue": ".Relevance"
+            "defaultValue": ".relevance"
           }
         },
         "baseName": "search"
@@ -292,7 +276,7 @@
       "commentThreads.list": {
         "queryParams": {
           "moderationStatus": {
-            "defaultValue": ".Published"
+            "defaultValue": ".published"
           }
         }
       },
@@ -357,7 +341,7 @@
         }
       },
       "videos.rate": {
-        "fullMethodName": "addRating(rating: YoutubeVideosRating, toVideoWithId id: String, completionHandler: (success: Bool?, error: NSError?) -> ())"
+        "fullMethodName": "addRating(rating: YoutubeVideosRating, toVideoWithId id: String, completionHandler: @escaping (_ result: GoogleResult<Bool>) -> ())"
       },
       "videos.getRatings": {
         "baseName": "getRatings",
@@ -374,7 +358,7 @@
       "videos.reportAbuse": {
         "baseName": "reportAbuseForVideo",
         "paramNames": {
-          "0": "withReport"
+          "0": "with"
         }
       },
       "videos.update": {
@@ -393,7 +377,7 @@
       "sponsors.list": {
         "queryParams": {
           "filter": {
-            "defaultValue": ".Newest"
+            "defaultValue": ".newest"
           }
         }
       },

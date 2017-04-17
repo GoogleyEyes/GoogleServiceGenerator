@@ -13,21 +13,21 @@ class Generator {
     static let sharedInstance = Generator()
     var folder: String = ""
     var serviceName: String = ""
-    private init() {
+    fileprivate init() {
         
     }
     
-    func generate(serviceName name: String, version: String, destinationPath: String, completionHandler: (success: Bool, error: ErrorType?) -> ()) {
+    func generate(serviceName name: String, version: String, destinationPath: String, completionHandler: @escaping (_ success: Bool, _ error: Error?) -> ()) {
         folder = destinationPath
         
         loadOverrideFile(name)
         
-        Discovery().getDiscoveryDocument(forAPI: name, version: version, completionHandler: { (restDescription, error) -> () in
-            if error != nil {
-                completionHandler(success: false, error: error)
+        Discovery().getDiscoveryDocument(forAPI: name, version: version, completionHandler: { result in
+            if result.error != nil {
+                completionHandler(false, result.error)
                 return
             }
-            if let discoveryDoc = restDescription {
+            if let discoveryDoc = result.value {
                 self.serviceName = discoveryDoc.name.objcName(shouldCapitalize: true)
                 // 1. Create model using Schemas
                 var model = self.createModelUsingSchemas(fromDiscoveryDoc: discoveryDoc)
@@ -35,14 +35,14 @@ class Generator {
                 let serviceClass = SchemaToServiceClassTransformer().serviceClass(fromDiscoveryDoc: discoveryDoc)
                 // 3. add main class and other associated model to model dictionary
                 var serviceModelItems: [SourceFileGeneratable] = [serviceClass]
-                serviceModelItems.appendContentsOf(self.createExtraModelForGlobalQueryParams(discoveryDoc.parameters))
-                serviceModelItems.appendContentsOf(self.createExtraModelForMethodsInDiscoveryDoc(discoveryDoc))
+                serviceModelItems.append(contentsOf: self.createExtraModelForGlobalQueryParams(discoveryDoc.parameters))
+                serviceModelItems.append(contentsOf: self.createExtraModelForMethodsInDiscoveryDoc(discoveryDoc))
                 serviceModelItems.append(SchemaToServiceClassTransformer().scopesEnum(fromSchema: discoveryDoc.auth.OAuthScopes))
                 model[serviceClass.name] = serviceModelItems
                 
                 // 4. write files
                 self.createFilesForGeneratedItems(model, completionHandler: { (success, error) -> () in
-                    completionHandler(success: success, error: error)
+                    completionHandler(success, error)
                 })
             }
         })
@@ -87,7 +87,7 @@ class Generator {
         return model
     }
     
-    func createExtraModelForGlobalQueryParams(params: [String: DiscoveryJSONSchema]) -> [SourceFileGeneratable] {
+    func createExtraModelForGlobalQueryParams(_ params: [String: DiscoveryJSONSchema]) -> [SourceFileGeneratable] {
         var modelItems: [SourceFileGeneratable] = []
         for (propertyName, propertyInfo) in params {
             if propertyInfo.type == "object" && propertyInfo.properties != nil {
@@ -99,7 +99,7 @@ class Generator {
         return modelItems
     }
     
-    func createExtraModelForMethodsInDiscoveryDoc(doc: DiscoveryRestDescription) -> [SourceFileGeneratable] {
+    func createExtraModelForMethodsInDiscoveryDoc(_ doc: DiscoveryRestDescription) -> [SourceFileGeneratable] {
         var modelItems: [SourceFileGeneratable] = []
         for (resourceName, resourceInfo) in doc.resources {
             for (_, methodInfo) in resourceInfo.methods {
@@ -118,22 +118,22 @@ class Generator {
         return modelItems
     }
     
-    func createFilesForGeneratedItems(items: [String: [SourceFileGeneratable]], completionHandler: (success: Bool, error: ErrorType?) -> ()) {
+    func createFilesForGeneratedItems(_ items: [String: [SourceFileGeneratable]], completionHandler: (_ success: Bool, _ error: Error?) -> ()) {
         for (itemName, itemContent) in items {
             let url = folder + "/\(itemName).swift"
             let content = completeString(itemContent, name: itemName)
             
             do {
-                try content.writeToFile(url, atomically: true, encoding: NSUTF8StringEncoding)
+                try content.write(toFile: url, atomically: true, encoding: String.Encoding.utf8)
             } catch {
-                completionHandler(success: false, error: error)
+                completionHandler(false, error)
                 return
             }
         }
-        completionHandler (success: true, error: nil)
+        completionHandler (true, nil)
     }
     
-    private func completeString(items: [SourceFileGeneratable], name: String) -> String {
+    fileprivate func completeString(_ items: [SourceFileGeneratable], name: String) -> String {
         // 1. comments
         var string = "//"
         string.addNewLine()
@@ -143,20 +143,18 @@ class Generator {
         string.addNewLine()
         string += "//"
         string.addNewLine()
-        let formatter = NSDateFormatter()
+        let formatter = DateFormatter()
         formatter.dateFormat = "M/d/yy"
-        let dateString = formatter.stringFromDate(NSDate())
+        let dateString = formatter.string(from: Date())
         string += "//  Created by Matthew Wyskiel on \(dateString)."
         string.addNewLine()
-        let comps = NSCalendar.currentCalendar().components(.Year, fromDate: NSDate())
+        let comps = NSCalendar.current.dateComponents([.year], from: Date())
         string += "//  Copyright © \(comps.year) Matthew Wyskiel. All rights reserved."
         string.addNewLine()
         string += "//"
         string.addNewLine(); string.addNewLine()
         // 2. imports
         string += "import Foundation"
-        string.addNewLine()
-        string += "import ObjectMapper"
         string.addNewLine(); string.addNewLine()
         print("Items: \(items)")
         let itemSet = Set<SourceFileGeneratable>(items)
